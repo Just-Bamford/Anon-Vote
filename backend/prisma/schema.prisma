@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id           String    @id @default(uuid())
+  name         String    @unique
+  email        String
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+  ballots      Ballot[]
+}
+
+model Session {
+  id             String       @id @default(uuid())
+  token          String       @unique
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  expiresAt      DateTime
+  createdAt      DateTime     @default(now())
+}
+
+model Ballot {
+  id                String          @id @default(uuid())
+  organizationId    String
+  organization      Organization    @relation(fields: [organizationId], references: [id])
+  topic             String
+  status            BallotStatus    @default(OPEN)
+  deadline          DateTime
+  eligibilityListId String
+  eligibilityList   EligibilityList @relation(fields: [eligibilityListId], references: [id])
+  createdAt         DateTime        @default(now())
+  options           Option[]
+  votes             Vote[]
+  result            Result?
+  auditEvents       AuditEvent[]
+}
+
+enum BallotStatus {
+  OPEN
+  CLOSED
+}
+
+model Option {
+  id       String @id @default(uuid())
+  ballotId String
+  ballot   Ballot @relation(fields: [ballotId], references: [id])
+  text     String
+  votes    Vote[]
+}
+
+model EligibilityList {
+  id        String             @id @default(uuid())
+  createdAt DateTime           @default(now())
+  entries   EligibilityEntry[]
+  ballots   Ballot[]
+}
+
+model EligibilityEntry {
+  id                String          @id @default(uuid())
+  eligibilityListId String
+  eligibilityList   EligibilityList @relation(fields: [eligibilityListId], references: [id])
+  identifierHash    String
+  tokenIssued       Boolean         @default(false)
+
+  @@unique([eligibilityListId, identifierHash])
+}
+
+model VoterToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  ballotId  String
+  used      Boolean   @default(false)
+  issuedAt  DateTime  @default(now())
+  usedAt    DateTime?
+}
+
+model Vote {
+  id               String   @id @default(uuid())
+  ballotId         String
+  ballot           Ballot   @relation(fields: [ballotId], references: [id])
+  optionId         String
+  option           Option   @relation(fields: [optionId], references: [id])
+  encryptedPayload String
+  stellarTxId      String?
+  submittedAt      DateTime @default(now())
+}
+
+model Result {
+  id           String   @id @default(uuid())
+  ballotId     String   @unique
+  ballot       Ballot   @relation(fields: [ballotId], references: [id])
+  tallyJson    String
+  totalVotes   Int
+  isConsistent Boolean
+  stellarTxId  String?
+  publishedAt  DateTime @default(now())
+}
+
+model AuditEvent {
+  id          String         @id @default(uuid())
+  ballotId    String
+  ballot      Ballot         @relation(fields: [ballotId], references: [id])
+  eventType   AuditEventType
+  stellarTxId String?
+  createdAt   DateTime       @default(now())
+}
+
+enum AuditEventType {
+  TOKEN_ISSUED
+  VOTE_CAST
+  RESULT_PUBLISHED
+  DUPLICATE_TOKEN_ATTEMPT
+  DUPLICATE_VOTE_ATTEMPT
+}
