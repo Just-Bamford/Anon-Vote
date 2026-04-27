@@ -1,12 +1,14 @@
 # AnonVote
 
-**Private Decision Infrastructure for Organizations on Stellar**
+> Private decision infrastructure for organizations on Stellar.
 
-AnonVote is a privacy-preserving voting platform that lets institutions — schools, companies, and communities — run secure anonymous votes with verifiable, tamper-proof results recorded on the Stellar blockchain.
+AnonVote lets institutions run secure anonymous votes where participation is confidential, results are verifiable, and records are tamper-proof on the Stellar blockchain.
 
 ---
 
-## Why AnonVote
+<details>
+<summary><strong>Why AnonVote</strong></summary>
+<br>
 
 Most digital voting tools expose voter identity, store results centrally, and offer no real verification. AnonVote is built differently:
 
@@ -15,9 +17,13 @@ Most digital voting tools expose voter identity, store results centrally, and of
 - **Results are verifiable** — anyone can confirm outcomes via Stellar transaction records
 - **Records are immutable** — nothing can be altered after submission
 
+</details>
+
 ---
 
-## Who It's For
+<details>
+<summary><strong>Who It's For</strong></summary>
+<br>
 
 | Sector          | Use Cases                                                 |
 | --------------- | --------------------------------------------------------- |
@@ -25,9 +31,13 @@ Most digital voting tools expose voter identity, store results centrally, and of
 | **Corporate**   | Policy votes, leadership surveys, board approvals         |
 | **Communities** | Governance decisions, membership votes, program approvals |
 
+</details>
+
 ---
 
-## How It Works
+<details>
+<summary><strong>How It Works</strong></summary>
+<br>
 
 ```
 Eligible Voter List
@@ -51,9 +61,13 @@ Eligible Voter List
 4. After the deadline, votes are **automatically tallied** and results published
 5. Anyone can **verify the result** via the public verification page and Stellar transaction links
 
+</details>
+
 ---
 
-## Tech Stack
+<details>
+<summary><strong>Tech Stack</strong></summary>
+<br>
 
 | Layer      | Technology                                            |
 | ---------- | ----------------------------------------------------- |
@@ -64,9 +78,13 @@ Eligible Voter List
 | Auth       | JWT via HTTP-only cookies, bcrypt                     |
 | Crypto     | AES-256-GCM vote encryption, SHA-256 identity hashing |
 
+</details>
+
 ---
 
-## Project Structure
+<details>
+<summary><strong>Project Structure</strong></summary>
+<br>
 
 ```
 AnonVote/
@@ -75,7 +93,8 @@ AnonVote/
 │   │   ├── routes/       # API route handlers
 │   │   ├── services/     # Business logic (identity, ballot, privacy, result engines)
 │   │   ├── middleware/   # Auth, rate limiting, error handling
-│   │   └── utils/        # Crypto helpers, deadline scheduler
+│   │   ├── utils/        # Crypto helpers, deadline scheduler
+│   │   └── tests/        # Unit + integration + E2E tests
 │   └── prisma/           # Database schema
 ├── frontend/             # React SPA
 │   └── src/
@@ -88,30 +107,34 @@ AnonVote/
 └── .env.example          # Environment variable template
 ```
 
+</details>
+
 ---
 
-## Getting Started
+<details>
+<summary><strong>Getting Started</strong></summary>
+<br>
 
-### Prerequisites
+**Prerequisites**
 
 - Node.js 20+
 - Docker (for PostgreSQL)
 - A Stellar account (Testnet for development)
 
-### 1. Clone the repo
+**1. Clone the repo**
 
 ```bash
 git clone https://github.com/Just-Bamford/AnonVote.git
 cd AnonVote
 ```
 
-### 2. Set up environment variables
+**2. Set up environment variables**
 
 ```bash
 cp .env.example .env
 ```
 
-Fill in the values in `.env`:
+Fill in `.env`:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/anonvote
@@ -121,40 +144,38 @@ BALLOT_ENCRYPTION_KEY=your-32-byte-hex-key
 NODE_ENV=development
 ```
 
-### 3. Start the database
+**3. Start the database**
 
 ```bash
 docker-compose up -d
 ```
 
-### 4. Install dependencies and run migrations
+**4. Install dependencies and run migrations**
+
+```bash
+cd backend && npm install && npx prisma migrate dev
+cd ../frontend && npm install
+```
+
+**5. Start dev servers**
 
 ```bash
 # Backend
-cd backend
-npm install
-npx prisma migrate dev
+npm run dev:backend
 
 # Frontend
-cd ../frontend
-npm install
+npm run dev:frontend
 ```
 
-### 5. Start the development servers
+Frontend → `http://localhost:5173` · Backend → `http://localhost:3001`
 
-```bash
-# Backend (from /backend)
-npm run dev
-
-# Frontend (from /frontend)
-npm run dev
-```
-
-Frontend runs at `http://localhost:5173`, backend at `http://localhost:3000`.
+</details>
 
 ---
 
-## API Overview
+<details>
+<summary><strong>API Reference</strong></summary>
+<br>
 
 | Method | Endpoint                    | Auth    | Description            |
 | ------ | --------------------------- | ------- | ---------------------- |
@@ -170,9 +191,13 @@ Frontend runs at `http://localhost:5173`, backend at `http://localhost:3000`.
 | GET    | `/api/results/:ballotId`    | —       | Get published result   |
 | GET    | `/api/audit/:ballotId`      | —       | Get audit event counts |
 
+</details>
+
 ---
 
-## Privacy Design
+<details>
+<summary><strong>Privacy Design</strong></summary>
+<br>
 
 - Voter identifiers are **SHA-256 hashed** before storage — originals are never recoverable
 - Voter tokens are **32-byte CSPRNG values** — only their hash is stored
@@ -180,17 +205,25 @@ Frontend runs at `http://localhost:5173`, backend at `http://localhost:3000`.
 - Vote payloads are **AES-256-GCM encrypted** — tallying decrypts only the option selection
 - Audit logs record **event counts only** — no identity, no token values
 
----
-
-## Stellar Integration
-
-All votes and audit events are written to the Stellar blockchain as `manageData` operations on a dedicated AnonVote account. Each record gets a Stellar transaction ID that is stored in the database and surfaced on the public verification page — so anyone can independently confirm results without trusting AnonVote's servers.
-
-Stellar Testnet is used for development. Switch to Mainnet by updating `STELLAR_SECRET_KEY` and the network passphrase in config.
+</details>
 
 ---
 
-## Roadmap
+<details>
+<summary><strong>Stellar Integration</strong></summary>
+<br>
+
+All votes and audit events are written to the Stellar blockchain as `manageData` operations on a dedicated AnonVote account. Each record gets a Stellar transaction ID stored in the database and surfaced on the public verification page — so anyone can independently confirm results without trusting AnonVote's servers.
+
+Stellar Testnet is used for development. Switch to Mainnet by updating `STELLAR_SECRET_KEY` and setting `STELLAR_NETWORK=mainnet` in your `.env`.
+
+</details>
+
+---
+
+<details>
+<summary><strong>Roadmap</strong></summary>
+<br>
 
 - [x] Organization registration and admin auth
 - [x] Ballot creation with eligibility list upload
@@ -203,9 +236,28 @@ Stellar Testnet is used for development. Switch to Mainnet by updating `STELLAR_
 - [ ] Delegated voting
 - [ ] Multi-round / ranked-choice voting
 - [ ] Blind vote verification (voter self-verification without identity exposure)
+- [ ] Soroban smart contracts (fully on-chain logic)
+
+</details>
 
 ---
 
-## License
+<details>
+<summary><strong>Running Tests</strong></summary>
+<br>
 
-MIT
+```bash
+# Backend tests (requires running PostgreSQL)
+npm run test:backend
+
+# Frontend tests
+npm run test:frontend
+```
+
+Test coverage includes: crypto utilities, organization registration/login, token issuance, vote submission, audit counts, and a full end-to-end flow.
+
+</details>
+
+---
+
+**License:** MIT
