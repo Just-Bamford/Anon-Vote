@@ -2,16 +2,19 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import type { Ballot } from "../types";
 import Toast from "./Toast";
+import { deleteBallot } from "../api/client";
 
 interface Props {
   ballot: Ballot;
+  onBallotDeleted: () => void;
 }
 
-export default function BallotCard({ ballot }: Props) {
+export default function BallotCard({ ballot, onBallotDeleted }: Props) {
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isOpen = ballot.status === "OPEN";
   const deadline = new Date(ballot.deadline);
@@ -27,6 +30,25 @@ export default function BallotCard({ ballot }: Props) {
         message: "Failed to copy link. Please try again.",
         type: "error",
       });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this ballot?")) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteBallot(ballot.id);
+      setToast({ message: "Ballot deleted successfully", type: "success" });
+      onBallotDeleted();
+    } catch (err) {
+      console.error("Failed to delete:", err);
+      setToast({
+        message: "Failed to delete ballot. Please try again.",
+        type: "error",
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -199,6 +221,18 @@ export default function BallotCard({ ballot }: Props) {
         >
           Audit
         </Link>
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="btn-danger"
+          style={{
+            fontSize: "var(--text-sm)",
+            padding: "8px 12px",
+            minWidth: "auto",
+          }}
+        >
+          {isDeleting ? "Deleting..." : "Delete"}
+        </button>
       </div>
 
       {/* Toast Notification */}

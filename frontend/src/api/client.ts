@@ -52,6 +52,9 @@ export const getBallots = () => api.get<ApiResponse<Ballot[]>>("/ballots");
 export const getBallot = (id: string) =>
   api.get<ApiResponse<Ballot>>(`/ballots/${id}`);
 
+export const deleteBallot = (id: string) =>
+  api.delete<ApiResponse<{ message: string }>>(`/ballots/${id}`);
+
 export const createBallot = (data: {
   topic: string;
   options: string[];

@@ -4,6 +4,7 @@ import {
   createBallot,
   getBallotsByOrg,
   getBallotById,
+  deleteBallot,
 } from "../services/ballotEngine";
 import { badRequest } from "../utils/errors";
 
@@ -58,5 +59,19 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
     next(err);
   }
 });
+
+// DELETE /api/ballots/:id — Delete a ballot
+router.delete(
+  "/:id",
+  requireAuth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await deleteBallot(req.params.id, req.organization!.id);
+      res.status(200).json({ message: "Ballot deleted successfully" });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 export default router;
