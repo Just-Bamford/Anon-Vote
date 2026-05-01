@@ -20,7 +20,7 @@ export default function Footer() {
 
       <div className="footer-links">
         <a
-          href="https://github.com/Just-Bamford/AnonVote#readme"
+          href="https://github.com/Just-Bamford/AnonVote/blob/main/README.md"
           target="_blank"
           rel="noopener noreferrer"
           className="footer-link"
@@ -50,14 +50,6 @@ export default function Footer() {
           className="footer-link"
         >
           Stellar
-        </a>
-        <a
-          href="https://status.anonvote.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="footer-link"
-        >
-          Status
         </a>
       </div>
     </footer>

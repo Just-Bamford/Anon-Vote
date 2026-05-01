@@ -28,50 +28,81 @@ export default function AuditPage() {
   return (
     <div className="page-wrapper">
       <Navbar />
-      <div className="page-content">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <div className="section-eyebrow">Audit Log</div>
-              <h1 className="text-3xl font-space-grotesk font-bold">
-                Audit Log
-              </h1>
-            </div>
-            {ballotId && (
-              <Link
-                to={`/results/${ballotId}`}
-                className="text-primary hover:text-primary-hover text-sm font-medium"
-              >
-                ← Results
-              </Link>
-            )}
+      <div
+        style={{
+          maxWidth: "860px",
+          margin: "0 auto",
+          padding: "var(--space-10) var(--space-6)",
+          width: "100%",
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <div className="text-eyebrow mb-2">Audit Log</div>
+            <h1
+              className="font-space-grotesk font-bold"
+              style={{
+                fontSize: "var(--text-2xl)",
+                color: "var(--ink-primary)",
+              }}
+            >
+              Audit Log
+            </h1>
           </div>
-          {ballot && (
-            <p className="text-gray-600 dark:text-gray-300 mb-8">
-              {ballot.topic}
-            </p>
+          {ballotId && (
+            <Link
+              to={`/results/${ballotId}`}
+              className="link-dark"
+              style={{ fontSize: "var(--text-sm)" }}
+            >
+              ← Results
+            </Link>
           )}
-
-          {loading ? (
-            <div className="space-y-4">
-              {[1, 2].map((i) => (
-                <div key={i} className="card rounded-xl h-20 animate-pulse" />
-              ))}
-            </div>
-          ) : error ? (
-            <div className="card p-8 text-center">
-              <p className="text-gray-600 dark:text-gray-400">{error}</p>
-            </div>
-          ) : audit ? (
-            <div className="card p-6">
-              <AuditTable
-                events={audit.events}
-                tokensIssued={audit.tokensIssued}
-                votesCast={audit.votesCast}
-              />
-            </div>
-          ) : null}
         </div>
+
+        {ballot && (
+          <p
+            style={{
+              color: "var(--ink-muted)",
+              fontSize: "var(--text-base)",
+              marginBottom: "var(--space-8)",
+            }}
+          >
+            {ballot.topic}
+          </p>
+        )}
+
+        {/* Content */}
+        {loading ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "var(--space-4)",
+            }}
+          >
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className="skeleton"
+                style={{ height: "80px", borderRadius: "var(--radius-lg)" }}
+              />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="card p-8" style={{ textAlign: "center" }}>
+            <p style={{ color: "var(--ink-muted)" }}>{error}</p>
+          </div>
+        ) : audit ? (
+          <div className="card p-6">
+            <AuditTable
+              events={audit.events}
+              tokensIssued={audit.tokensIssued}
+              votesCast={audit.votesCast}
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );

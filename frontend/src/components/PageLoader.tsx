@@ -119,12 +119,12 @@ export default function PageLoader() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        gap: "24px",
+        gap: "8px",
         backgroundColor: "var(--surface-base)",
         zIndex: 9999,
       }}
     >
-      <div style={{ width: "180px", height: "180px" }}>
+      <div style={{ width: "140px", height: "140px" }}>
         <svg
           viewBox="0 0 100 100"
           fill="none"
@@ -149,7 +149,7 @@ export default function PageLoader() {
       <div
         style={{
           fontFamily: "var(--font-display)",
-          fontSize: "var(--text-sm)",
+          fontSize: "var(--text-base)",
           color: "var(--ink-muted)",
           letterSpacing: "0.12em",
           textTransform: "uppercase",

@@ -66,6 +66,40 @@ Eligible Voter List
 ---
 
 <details>
+<summary><strong>User Flow</strong></summary>
+<br>
+
+**For Administrators (Ballot Creators)**
+
+1. Go to `/register` and create an organization account
+2. Log in at `/login` with your credentials
+3. Navigate to `/dashboard` to see all your ballots
+4. Click "+ Create Ballot" to start a new vote
+5. Fill in the ballot details (topic, options, deadline) and upload your eligible voter list (CSV)
+6. After the voting period ends, results are automatically published at `/results/:ballotId`
+
+**For Voters (End Users)**
+
+1. Receive a link from your organization admin (e.g., `https://anonvote.app/vote/123/token`)
+2. Go to `/vote/:ballotId/token` and enter your voter identifier (email, employee ID, etc.)
+3. Click "Get My Token" — you'll receive a one-time anonymous token
+4. Copy or save your token (you'll need it to vote)
+5. Go to `/vote/:ballotId` and paste your token
+6. Select your preferred option and click "Cast Vote"
+7. Your vote is encrypted and recorded on the Stellar blockchain
+8. After the deadline, view results at `/results/:ballotId`
+
+**For Anyone (Public Verification)**
+
+1. Visit `/results/:ballotId` to see published results
+2. Check the "Blockchain Verification" section for the Stellar transaction link
+3. Visit `/audit/:ballotId` to see audit event counts (no personal data)
+
+</details>
+
+---
+
+<details>
 <summary><strong>Tech Stack</strong></summary>
 <br>
 
