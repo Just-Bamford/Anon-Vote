@@ -1,0 +1,188 @@
+import { useRef, useEffect, useState } from "react";
+import { useNotifications } from "../context/NotificationContext";
+import "./Navbar.css";
+
+export default function NotificationDropdown() {
+  const { notifications, markAllAsRead } = useNotifications();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
+  const recentNotifications = [...notifications]
+    .sort((a, b) => parseInt(a.time) - parseInt(b.time))
+    .slice(0, 10);
+
+  return (
+    <div style={{ position: "relative" }} ref={dropdownRef}>
+      {/* Bell Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="navbar-bell"
+        aria-label="Notifications"
+      >
+        <svg
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
+        </svg>
+        {notifications.some((n) => !n.read) && (
+          <span className="navbar-bell-dot" aria-hidden="true" />
+        )}
+      </button>
+
+      {/* Dropdown */}
+      {isOpen && (
+        <div
+          className="navbar-dropdown"
+          style={{
+            minWidth: "250px",
+            maxWidth: "250px",
+            top: "calc(100% + 8px)",
+          }}
+        >
+          {/* Header */}
+          <div
+            style={{
+              padding: "var(--space-3) var(--space-4)",
+              borderBottom: "1px solid var(--border-soft)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: "var(--weight-semibold)",
+                fontSize: "var(--text-sm)",
+                color: "var(--ink-primary)",
+              }}
+            >
+              Notifications
+            </span>
+            <button
+              onClick={markAllAsRead}
+              className="navbar-dropdown-item"
+              style={{
+                width: "auto",
+                padding: "2px 8px",
+                fontSize: "var(--text-xs)",
+                borderRadius: "var(--radius-sm)",
+              }}
+            >
+              Mark all read
+            </button>
+          </div>
+
+          {/* Content */}
+          <div style={{ maxHeight: "320px", overflowY: "auto" }}>
+            {notifications.length === 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "var(--space-2)",
+                  padding: "var(--space-6) var(--space-4)",
+                }}
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  style={{ color: "var(--ink-muted)" }}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
+                </svg>
+                <span
+                  style={{
+                    fontSize: "var(--text-sm)",
+                    color: "var(--ink-muted)",
+                  }}
+                >
+                  No notifications yet
+                </span>
+              </div>
+            ) : (
+              recentNotifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className="navbar-dropdown-item"
+                  style={{
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    gap: "var(--space-1)",
+                    borderLeft: !notification.read
+                      ? "3px solid var(--brand-primary)"
+                      : "3px solid transparent",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: "var(--weight-medium)",
+                      fontSize: "var(--text-sm)",
+                      color: "var(--ink-primary)",
+                    }}
+                  >
+                    {notification.title}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "var(--text-xs)",
+                      color: "var(--ink-muted)",
+                    }}
+                  >
+                    {notification.message}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: "var(--text-xs)",
+                      color: "var(--ink-muted)",
+                    }}
+                  >
+                    {notification.time}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

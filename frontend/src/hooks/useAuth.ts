@@ -4,6 +4,7 @@ import { getMe, logoutOrg } from "../api/client";
 interface AuthState {
   isAuthenticated: boolean;
   orgName: string | null;
+  orgEmail: string | null;
   orgId: string | null;
   loading: boolean;
 }
@@ -12,6 +13,7 @@ export function useAuth(): AuthState & { logout: () => Promise<void> } {
   const [state, setState] = useState<AuthState>({
     isAuthenticated: false,
     orgName: null,
+    orgEmail: null,
     orgId: null,
     loading: true,
   });
@@ -23,6 +25,7 @@ export function useAuth(): AuthState & { logout: () => Promise<void> } {
       setState({
         isAuthenticated: false,
         orgName: null,
+        orgEmail: null,
         orgId: null,
         loading: false,
       });
@@ -34,6 +37,7 @@ export function useAuth(): AuthState & { logout: () => Promise<void> } {
         setState({
           isAuthenticated: true,
           orgName: res.data.data.name,
+          orgEmail: res.data.data.email,
           orgId: res.data.data.id,
           loading: false,
         });
@@ -42,6 +46,7 @@ export function useAuth(): AuthState & { logout: () => Promise<void> } {
         setState({
           isAuthenticated: false,
           orgName: null,
+          orgEmail: null,
           orgId: null,
           loading: false,
         });
@@ -55,6 +60,7 @@ export function useAuth(): AuthState & { logout: () => Promise<void> } {
       setState({
         isAuthenticated: false,
         orgName: null,
+        orgEmail: null,
         orgId: null,
         loading: false,
       });

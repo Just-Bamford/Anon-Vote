@@ -1,11 +1,46 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/ThemeContext";
+import { useState, useRef, useEffect } from "react";
+import NotificationDropdown from "./NotificationDropdown";
 import "./Navbar.css";
 
 export default function Navbar() {
-  const { isAuthenticated, logout, loading } = useAuth();
+  const { isAuthenticated, orgName, orgEmail, logout, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  // User avatar dropdown state
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target as Node)
+      ) {
+        setIsProfileOpen(false);
+      }
+    }
+
+    if (isProfileOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isProfileOpen]);
+
+  const handleProfileClick = () => {
+    navigate("/settings");
+  };
+
+  const handleLogoutClick = () => {
+    logout();
+  };
 
   if (loading) {
     return (
@@ -21,21 +56,6 @@ export default function Navbar() {
         </div>
         <div className="flex items-center gap-4">
           <span className="navbar-network font-mono">STELLAR TESTNET</span>
-          <button className="theme-toggle" disabled>
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-              />
-            </svg>
-          </button>
         </div>
       </nav>
     );
@@ -67,51 +87,111 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         <span className="navbar-network">STELLAR TESTNET</span>
 
-        <button
-          onClick={toggleTheme}
-          className="theme-toggle"
-          aria-label="Toggle theme"
-        >
-          {theme === "light" ? (
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-              />
-            </svg>
-          ) : (
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          )}
-        </button>
-
         {isAuthenticated ? (
-          <div className="flex items-center gap-4">
-            <button
-              onClick={logout}
-              className="btn-primary"
-              style={{ minHeight: "36px", padding: "8px 16px" }}
-            >
-              Logout
-            </button>
+          <div className="flex items-center gap-2">
+            {/* Notification Bell */}
+            <NotificationDropdown />
+
+            {/* User Avatar / Profile Button */}
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="navbar-avatar"
+                aria-label="Profile"
+              >
+                {orgName ? orgName.charAt(0).toUpperCase() : "U"}
+              </button>
+
+              {/* Profile Dropdown */}
+              {isProfileOpen && (
+                <div className="navbar-dropdown card">
+                  <div className="profile-header">
+                    <span className="avatar-text">
+                      {orgName ? orgName.charAt(0).toUpperCase() : "U"}
+                    </span>
+                    <div className="profile-info">
+                      <span className="profile-name">{orgName || "User"}</span>
+                      <span className="profile-email">
+                        {orgEmail || "org@example.com"}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="navbar-dropdown-divider" />
+                  <button
+                    onClick={handleProfileClick}
+                    className="navbar-dropdown-item"
+                  >
+                    <svg
+                      className="profile-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
+                    </svg>
+                    <span className="profile-option-text">
+                      Profile & Settings
+                    </span>
+                  </button>
+                  <div className="navbar-dropdown-divider" />
+                  <button
+                    onClick={toggleTheme}
+                    className="navbar-dropdown-item"
+                  >
+                    <svg
+                      className="profile-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      {theme === "light" ? (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                        />
+                      ) : (
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                        />
+                      )}
+                    </svg>
+                    <span className="profile-option-text">
+                      {theme === "light" ? "Switch to Dark" : "Switch to Light"}
+                    </span>
+                  </button>
+                  <div className="navbar-dropdown-divider" />
+                  <button
+                    onClick={handleLogoutClick}
+                    className="navbar-dropdown-item danger"
+                  >
+                    <svg
+                      className="profile-icon"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                    <span className="profile-option-text">Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="flex items-center gap-4">

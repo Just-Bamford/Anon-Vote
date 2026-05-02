@@ -61,3 +61,55 @@ All notable changes to AnonVote will be documented here.
 - **Frontend scaffolding** — React with Vite, TypeScript, Tailwind CSS
 - **API client** — TypeScript client with axios interceptors
 - **Theme context** — Dark/light mode toggle with localStorage persistence
+
+---
+
+## v1.2.0
+
+### Added
+
+- **Notification system** — App-wide notification management with `NotificationContext`
+  - `NotificationContext.tsx` — Stores notifications in state with types: `ballot_created`, `ballot_closed`, `results_published`, `token_requested`, `warning`
+  - `NotificationDropdown.tsx` — Reusable notification dropdown component
+  - `useNotifications()` hook — Access notifications, unread count, mark all as read, add notification
+  - LocalStorage persistence for notifications
+  - 3 seed notifications on first load
+
+- **Navbar redesign** — Replaced standalone Logout button and theme toggle with new elements:
+  - **Notification Bell** — Bell icon with red dot indicator for unread notifications
+    - Clicking opens notification dropdown overlay (no page navigation)
+    - Shows up to 10 most recent notifications
+    - "Mark all as read" button at top
+    - Click-outside detection to close dropdown
+  - **User Avatar / Profile Button** — Circular avatar showing first letter of org name
+    - Background: `var(--brand-primary)`, text: white, font: `var(--font-display)`
+    - Dropdown with: Profile & Settings, Theme toggle, Logout
+    - Click-outside detection to close dropdown
+
+- **Auth state enhancement** — Added `orgEmail` to `useAuth()` hook
+  - Fetches email from `getMe()` API response
+  - Updated all state updates to include `orgEmail`
+
+### Improved
+
+- **Consistent dropdown styling** — Both notification and profile dropdowns use same base classes:
+  - `navbar-dropdown` — Shared positioning, z-index, animation
+  - `navbar-dropdown-item` — Consistent hover effects and transitions
+  - `navbar-dropdown-divider` — Uniform divider styling
+  - `navbar-avatar` — Circular avatar with hover opacity effect
+  - `navbar-bell` — Bell icon with consistent hover behavior
+  - `navbar-bell-dot` — Red dot indicator for unread notifications
+
+- **Profile dropdown** — Now uses `orgEmail` from auth state instead of hardcoded `org@example.com`
+
+### Technical
+
+- **New files:**
+  - `frontend/src/context/NotificationContext.tsx`
+  - `frontend/src/components/NotificationDropdown.tsx`
+
+- **Updated files:**
+  - `frontend/src/hooks/useAuth.ts` — Added `orgEmail` to auth state
+  - `frontend/src/components/Navbar.tsx` — New notification bell and avatar dropdown
+  - `frontend/src/components/Navbar.css` — New dropdown classes and styles
+  - `frontend/src/App.tsx` — Wrapped with `NotificationProvider`

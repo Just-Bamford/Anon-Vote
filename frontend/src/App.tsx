@@ -10,6 +10,7 @@ import ResultsPage from "./pages/ResultsPage";
 import AuditPage from "./pages/AuditPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PageLoader from "./components/PageLoader";
+import { NotificationProvider } from "./context/NotificationContext";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -22,32 +23,34 @@ export default function App() {
   if (loading) return <PageLoader />;
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/ballots/new"
-          element={
-            <ProtectedRoute>
-              <CreateBallotPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/vote/:ballotId/token" element={<TokenRequestPage />} />
-        <Route path="/vote/:ballotId" element={<VotePage />} />
-        <Route path="/results/:ballotId" element={<ResultsPage />} />
-        <Route path="/audit/:ballotId" element={<AuditPage />} />
-      </Routes>
-    </BrowserRouter>
+    <NotificationProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ballots/new"
+            element={
+              <ProtectedRoute>
+                <CreateBallotPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/vote/:ballotId/token" element={<TokenRequestPage />} />
+          <Route path="/vote/:ballotId" element={<VotePage />} />
+          <Route path="/results/:ballotId" element={<ResultsPage />} />
+          <Route path="/audit/:ballotId" element={<AuditPage />} />
+        </Routes>
+      </BrowserRouter>
+    </NotificationProvider>
   );
 }
