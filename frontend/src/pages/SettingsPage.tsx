@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/ThemeContext";
-import { updateOrg } from "../api/client";
+import { updateOrg, changePassword } from "../api/client";
 import Navbar from "../components/Navbar";
 import "./SettingsPage.css";
 
@@ -52,6 +52,37 @@ export default function SettingsPage() {
   const [orgStellarPublicKey] = useState<string | null>(null);
   const [lastTransactionId] = useState<string | null>(null);
   const [totalTransactions] = useState<number>(0);
+
+  // Security state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleUpdatePassword = async () => {
+    if (newPassword.length < 8 || newPassword !== confirmPassword) return;
+    setSaveStatus("saving");
+    try {
+      await changePassword({ currentPassword, newPassword });
+      setSaveStatus("success");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setTimeout(() => setSaveStatus("idle"), 2000);
+    } catch {
+      setSaveStatus("error");
+    }
+  };
+
+  const getBrowserInfo = () => {
+    const ua = navigator.userAgent;
+    if (ua.includes("Chrome")) return "Chrome";
+    if (ua.includes("Firefox")) return "Firefox";
+    if (ua.includes("Safari")) return "Safari";
+    if (ua.includes("Edge")) return "Edge";
+    if (ua.includes("MSIE") || ua.includes("Trident"))
+      return "Internet Explorer";
+    return "Unknown";
+  };
 
   const sidebarItems = [
     { id: "profile", label: "Profile", icon: "profile" },
@@ -706,31 +737,136 @@ export default function SettingsPage() {
         return (
           <div className="settings-content">
             <h2 className="settings-title">Security</h2>
+            <p className="settings-page-subtitle">Keep your account safe.</p>
+
+            {/* Change Password Card */}
             <div className="card settings-card">
               <div className="settings-section-header">
-                <h3 className="settings-section-title">
-                  Password & Authentication
-                </h3>
+                <h3 className="settings-section-title">Change Password</h3>
                 <p className="settings-section-description">
-                  Keep your account secure
+                  Update your password to keep your account secure
                 </p>
               </div>
               <div className="form-group">
                 <label className="form-label">Current Password</label>
-                <input type="password" className="form-input" />
+                <input
+                  type="password"
+                  className="form-input"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
               </div>
               <div className="form-group">
                 <label className="form-label">New Password</label>
-                <input type="password" className="form-input" />
+                <input
+                  type="password"
+                  className="form-input"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+                {newPassword.length > 0 && newPassword.length < 8 && (
+                  <p className="form-error">
+                    Password must be at least 8 characters
+                  </p>
+                )}
               </div>
               <div className="form-group">
                 <label className="form-label">Confirm New Password</label>
-                <input type="password" className="form-input" />
+                <input
+                  type="password"
+                  className="form-input"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+                {confirmPassword.length > 0 &&
+                  newPassword !== confirmPassword && (
+                    <p className="form-error">Passwords do not match</p>
+                  )}
               </div>
+              {saveStatus === "success" && (
+                <div className="message message-success">
+                  <span className="message-icon">
+                    <svg
+                      width="16"
+                      height="16"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </span>
+                  <span>Password updated successfully</span>
+                </div>
+              )}
+              {saveStatus === "error" && (
+                <div className="message message-error">
+                  <span className="message-icon">
+                    <svg
+                      width="16"
+                      height="16"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                  </span>
+                  <span>Failed to update password. Please try again.</span>
+                </div>
+              )}
               <div className="form-actions">
-                <button className="btn-primary">Change Password</button>
+                <button
+                  className="btn-primary"
+                  onClick={handleUpdatePassword}
+                  disabled={
+                    saveStatus === "saving" ||
+                    newPassword.length < 8 ||
+                    newPassword !== confirmPassword
+                  }
+                >
+                  {saveStatus === "saving" ? "Updating..." : "Update Password"}
+                </button>
               </div>
             </div>
+
+            {/* Sessions Card */}
+            <div className="card settings-card">
+              <div className="settings-section-header">
+                <h3 className="settings-section-title">Active Sessions</h3>
+                <p className="settings-section-description">
+                  Manage your active sessions
+                </p>
+              </div>
+              <div className="session-row">
+                <div className="session-info">
+                  <span className="status-badge status-active">
+                    <span className="status-dot" />
+                    Current Session
+                  </span>
+                  <span className="session-browser">{getBrowserInfo()}</span>
+                  <span className="session-label">This device</span>
+                </div>
+                <button
+                  className="btn-ghost"
+                  onClick={() => alert("Sign out all other sessions clicked")}
+                >
+                  Sign out all other sessions
+                </button>
+              </div>
+            </div>
+
+            {/* Two-Factor Authentication Card */}
             <div className="card settings-card">
               <div className="settings-section-header">
                 <h3 className="settings-section-title">
@@ -742,10 +878,39 @@ export default function SettingsPage() {
               </div>
               <div className="form-group">
                 <label className="form-label">2FA Status</label>
-                <div className="status-badge status-active">Enabled</div>
+                <div className="form-row">
+                  <span
+                    className="status-badge"
+                    style={{
+                      backgroundColor: "var(--semantic-warning-light)",
+                      color: "var(--semantic-warning)",
+                    }}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      style={{ marginRight: "var(--space-2)" }}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
+                    </svg>
+                    Not enabled
+                  </span>
+                </div>
               </div>
               <div className="form-actions">
-                <button className="btn-secondary">Configure 2FA</button>
+                <button
+                  className="btn-ghost"
+                  onClick={() => alert("Coming soon")}
+                >
+                  Enable 2FA
+                </button>
               </div>
             </div>
           </div>

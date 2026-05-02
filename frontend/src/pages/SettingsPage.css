@@ -634,7 +634,6 @@
   color: white;
   border-color: var(--brand-primary);
 }
-
 /* Network Options */
 .network-options {
   display: flex;
@@ -669,4 +668,39 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Session Row */
+.session-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  background-color: var(--surface-sunken);
+  border-radius: var(--radius-md);
+}
+
+.session-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.session-browser {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+}
+
+.session-label {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  font-weight: var(--weight-medium);
+}
+
+/* Form Error */
+.form-error {
+  font-size: var(--text-sm);
+  color: var(--semantic-error);
+  margin-top: var(--space-1);
 }

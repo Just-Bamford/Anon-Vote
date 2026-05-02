@@ -49,6 +49,12 @@ export const getMe = () =>
 export const updateOrg = (data: { name?: string; email?: string }) =>
   api.patch<ApiResponse<Organization>>("/organizations/me", data);
 
+export const changePassword = (data: {
+  currentPassword: string;
+  newPassword: string;
+}) =>
+  api.patch<ApiResponse<{ message: string }>>("/organizations/password", data);
+
 // Ballots
 export const getBallots = () => api.get<ApiResponse<Ballot[]>>("/ballots");
 
