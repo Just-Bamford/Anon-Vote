@@ -3,12 +3,18 @@
   display: flex;
   gap: var(--space-6);
   margin-top: var(--space-6);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Sidebar */
 .settings-sidebar {
   width: 240px;
   flex-shrink: 0;
+  position: sticky;
+  top: var(--space-8);
+  height: fit-content;
 }
 
 .settings-sidebar-title {
@@ -89,7 +95,7 @@
   font-size: var(--text-2xl);
   font-weight: var(--weight-bold);
   color: var(--ink-primary);
-  margin-bottom: var(--space-6);
+  margin-bottom: var(--space-1);
 }
 
 .settings-card {
@@ -376,6 +382,7 @@
 }
 
 /* Profile Section Styles */
+
 .settings-page-subtitle {
   font-size: var(--text-base);
   color: var(--ink-secondary);
@@ -703,4 +710,36 @@
   font-size: var(--text-sm);
   color: var(--semantic-error);
   margin-top: var(--space-1);
+}
+/* Danger Zone Styles */
+.danger-title {
+  color: var(--semantic-error);
+}
+
+.danger-card {
+  border-color: var(--semantic-error-border);
+}
+
+.danger-card .settings-section-title {
+  color: var(--semantic-error);
+}
+
+.danger-confirm {
+  margin-top: var(--space-4);
+}
+
+.danger-confirm-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.btn-outline-danger {
+  background: transparent;
+  border: 2px solid var(--semantic-error);
+  color: var(--semantic-error);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--semantic-error-light);
 }

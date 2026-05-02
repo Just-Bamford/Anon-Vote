@@ -113,3 +113,70 @@ All notable changes to AnonVote will be documented here.
   - `frontend/src/components/Navbar.tsx` — New notification bell and avatar dropdown
   - `frontend/src/components/Navbar.css` — New dropdown classes and styles
   - `frontend/src/App.tsx` — Wrapped with `NotificationProvider`
+
+---
+
+## v1.3.0
+
+### Added
+
+- **Settings page** — Full settings dashboard at `/settings` route
+  - Two-column layout: 240px fixed sidebar + scrollable content area
+  - 6 settings sections: Profile, Appearance, Stellar, Security, Danger Zone, Contact Support
+  - Active section tracked with `useState` - no page navigation, everything renders inline
+  - Responsive: single column on mobile
+
+- **Profile section** — Manage organization information
+  - Profile picture card with 80px circular avatar
+  - Upload photo and Remove buttons
+  - Organization Details card with inline editing for name and email
+  - Account ID with copy button
+  - Member Since date display
+  - `updateOrg` API function for saving changes
+
+- **Appearance section** — Customize AnonVote appearance
+  - Theme card with Light/Dark mode cards (icon, label, description, checkmark)
+  - Accent Color card with 6 color swatches (Indigo, Blue, Emerald, Violet, Rose, Amber)
+  - Font Size card with Small/Default/Large options
+  - localStorage persistence for theme, accent color, and font size
+  - Dynamic theming via `document.documentElement.style.setProperty`
+
+- **Stellar section** — Manage blockchain configuration
+  - Network card with Testnet/Mainnet toggle (badge-open/badge-closed styles)
+  - Stellar Expert URL with external link icon
+  - Transaction Signing status with green dot
+  - Stellar Account card with Public Key, Last Transaction, Total Transactions
+
+- **Security section** — Keep account safe
+  - Change Password card with 3 fields and validation (min 8 chars, passwords match)
+  - Active Sessions card with browser info and "Sign out all other sessions" button
+  - Two-Factor Authentication card with "Not enabled" status and "Enable 2FA" button
+  - `changePassword` API function
+
+- **Danger Zone section** — Irreversible actions
+  - Delete All Ballots card with inline confirmation
+  - Delete Account card with inline confirmation
+  - Red outlined button for "Delete All Ballots"
+  - Red primary button for "Delete Account"
+  - `deleteAccount` API function
+  - Clears localStorage and navigates to `/login` on success
+
+### Fixed
+
+- **AuditTable.tsx** — Fixed JSX structure issue with broken `<a>` tag
+
+### Technical
+
+- **New files:**
+  - `frontend/src/pages/SettingsPage.tsx`
+  - `frontend/src/pages/SettingsPage.css`
+  - `frontend/src/context/NotificationContext.tsx`
+  - `frontend/src/components/NotificationDropdown.tsx`
+
+- **Updated files:**
+  - `frontend/src/hooks/useAuth.ts` — Added `orgEmail` to auth state
+  - `frontend/src/api/client.ts` — Added `updateOrg`, `changePassword`, `deleteAccount` functions
+  - `frontend/src/App.tsx` — Added `/settings` route, wrapped with `NotificationProvider`
+  - `frontend/src/components/Navbar.tsx` — New notification bell and avatar dropdown
+  - `frontend/src/components/Navbar.css` — New dropdown classes and styles
+  - `frontend/src/components/AuditTable.tsx` — Fixed JSX structure

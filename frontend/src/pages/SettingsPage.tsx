@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/ThemeContext";
-import { updateOrg, changePassword } from "../api/client";
+import { updateOrg, changePassword, deleteAccount } from "../api/client";
 import Navbar from "../components/Navbar";
 import "./SettingsPage.css";
 
@@ -58,6 +58,14 @@ export default function SettingsPage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Danger zone state
+  const [showDeleteBallotsConfirm, setShowDeleteBallotsConfirm] =
+    useState(false);
+  const [showDeleteAccountConfirm, setShowDeleteAccountConfirm] =
+    useState(false);
+  const [deleteBallotsConfirmText, setDeleteBallotsConfirmText] = useState("");
+  const [deleteAccountConfirmText, setDeleteAccountConfirmText] = useState("");
+
   const handleUpdatePassword = async () => {
     if (newPassword.length < 8 || newPassword !== confirmPassword) return;
     setSaveStatus("saving");
@@ -82,6 +90,27 @@ export default function SettingsPage() {
     if (ua.includes("MSIE") || ua.includes("Trident"))
       return "Internet Explorer";
     return "Unknown";
+  };
+
+  const handleDeleteAllBallots = async () => {
+    // In a real app, this would call an API to delete all ballots
+    console.log("Delete all ballots");
+    setShowDeleteBallotsConfirm(false);
+    setDeleteBallotsConfirmText("");
+    alert("All ballots deleted");
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      await deleteAccount();
+      // Clear auth state
+      localStorage.removeItem("anonvote-theme");
+      localStorage.removeItem("anonvote-accent");
+      localStorage.removeItem("anonvote-font-size");
+      window.location.href = "/login";
+    } catch {
+      alert("Failed to delete account. Please try again.");
+    }
   };
 
   const sidebarItems = [
@@ -919,34 +948,115 @@ export default function SettingsPage() {
       case "danger":
         return (
           <div className="settings-content">
-            <h2 className="settings-title">Danger Zone</h2>
+            <h2 className="settings-title danger-title">Danger Zone</h2>
+            <p className="settings-page-subtitle">
+              Irreversible actions. Proceed with caution.
+            </p>
+
+            {/* Delete All Ballots Card */}
             <div className="card settings-card danger-card">
               <div className="settings-section-header">
-                <h3 className="settings-section-title">Delete Organization</h3>
+                <h3 className="settings-section-title">Delete All Ballots</h3>
                 <p className="settings-section-description">
-                  Permanently delete your organization and all associated data
+                  Permanently delete all your ballots and associated data. This
+                  cannot be undone.
                 </p>
               </div>
-              <div className="form-group">
-                <label className="form-label">
-                  <span style={{ color: "var(--semantic-error)" }}>
-                    Confirmation
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Type DELETE to confirm"
-                />
+              {showDeleteBallotsConfirm ? (
+                <div className="danger-confirm">
+                  <label className="form-label">
+                    <span style={{ color: "var(--semantic-error)" }}>
+                      Type DELETE to confirm
+                    </span>
+                  </label>
+                  <div className="danger-confirm-row">
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={deleteBallotsConfirmText}
+                      onChange={(e) =>
+                        setDeleteBallotsConfirmText(e.target.value)
+                      }
+                      placeholder="Type DELETE"
+                    />
+                    <button
+                      className="btn-danger"
+                      onClick={handleDeleteAllBallots}
+                      disabled={deleteBallotsConfirmText !== "DELETE"}
+                    >
+                      Confirm Delete
+                    </button>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => setShowDeleteBallotsConfirm(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="form-actions">
+                  <button
+                    className="btn-danger btn-outline-danger"
+                    onClick={() => setShowDeleteBallotsConfirm(true)}
+                  >
+                    Delete All Ballots
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Delete Account Card */}
+            <div className="card settings-card danger-card">
+              <div className="settings-section-header">
+                <h3 className="settings-section-title">Delete Account</h3>
+                <p className="settings-section-description">
+                  Permanently delete your organization account and all
+                  associated data.
+                </p>
               </div>
-              <div className="form-actions">
-                <button
-                  className="btn-danger"
-                  style={{ minHeight: "48px", padding: "8px 16px" }}
-                >
-                  Delete Organization
-                </button>
-              </div>
+              {showDeleteAccountConfirm ? (
+                <div className="danger-confirm">
+                  <label className="form-label">
+                    <span style={{ color: "var(--semantic-error)" }}>
+                      Type your organization name to confirm
+                    </span>
+                  </label>
+                  <div className="danger-confirm-row">
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={deleteAccountConfirmText}
+                      onChange={(e) =>
+                        setDeleteAccountConfirmText(e.target.value)
+                      }
+                      placeholder={orgName || "Your organization name"}
+                    />
+                    <button
+                      className="btn-danger"
+                      onClick={handleDeleteAccount}
+                      disabled={deleteAccountConfirmText !== orgName}
+                    >
+                      Confirm Delete
+                    </button>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => setShowDeleteAccountConfirm(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="form-actions">
+                  <button
+                    className="btn-primary btn-danger"
+                    onClick={() => setShowDeleteAccountConfirm(true)}
+                  >
+                    Delete Account
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         );

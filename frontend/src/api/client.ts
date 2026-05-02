@@ -55,6 +55,9 @@ export const changePassword = (data: {
 }) =>
   api.patch<ApiResponse<{ message: string }>>("/organizations/password", data);
 
+export const deleteAccount = () =>
+  api.delete<ApiResponse<{ message: string }>>("/organizations/me");
+
 // Ballots
 export const getBallots = () => api.get<ApiResponse<Ballot[]>>("/ballots");
 
