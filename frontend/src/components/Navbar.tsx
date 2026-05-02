@@ -4,10 +4,9 @@ import { useTheme } from "../context/ThemeContext";
 import "./Navbar.css";
 
 export default function Navbar() {
-  const { isAuthenticated, orgName, logout, loading } = useAuth();
+  const { isAuthenticated, logout, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  // Show skeleton while auth state is loading
   if (loading) {
     return (
       <nav className="navbar">
@@ -56,13 +55,12 @@ export default function Navbar() {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
+            fillRule="evenodd"
+            clipRule="evenodd"
             d="M69.855 4.03008C38.4042 30.4279 13.841 76.588 4.63 126.602C2.0686 140.507 0 160.876 0 172.185V175.869L2.0414 175.864C7.1695 175.852 19.9452 174.673 26.0657 173.648C54.0254 168.962 70.2143 156.126 73.7523 135.838C74.6663 130.595 75.1252 129.451 75.1252 132.412C75.1252 135.656 77.189 142.715 79.5304 147.479C82.0825 152.672 87.569 158.877 92.672 162.344C104.335 170.268 119.918 174.457 142.035 175.617L149.334 176L148.991 165.182C147.956 132.635 140.417 99.6057 127.324 70.2584C114.89 42.3881 96.228 17.0856 76.6974 1.61683L74.656 0L69.855 4.03008ZM74.4148 44.6718C74.2411 45.4203 73.8084 47.3801 73.4534 49.0269C70.7086 61.7655 59.0364 75.312 46.135 80.733C44.0707 81.6002 40.6291 82.6754 38.4875 83.1217C36.3453 83.5681 34.5151 84.0118 34.4198 84.1071C34.3246 84.2024 35.544 84.4457 37.1292 84.6482C44.5068 85.59 54.34 90.8695 61.0142 97.4723C68.2512 104.633 71.7244 111.223 74.3582 122.791C74.6908 124.251 74.8046 124.049 75.4295 120.886C78.0867 107.445 88.001 94.8533 101.093 88.2923C104.214 86.7283 110.555 84.7266 113.777 84.2884C114.633 84.1719 113.523 83.738 110.783 83.1185C93.4 79.1897 78.9 64.3121 75.4328 46.8493C74.889 44.111 74.6587 43.6184 74.4148 44.6718Z"
             fill="currentColor"
           />
         </svg>
-
         <span>AnonVote</span>
       </Link>
 
@@ -107,12 +105,6 @@ export default function Navbar() {
 
         {isAuthenticated ? (
           <div className="flex items-center gap-4">
-            <div className="orgName">
-              <span className="font-dm-sans text-sm font-medium">
-                {orgName}
-              </span>
-            </div>
-
             <button
               onClick={logout}
               className="btn-primary"
@@ -123,12 +115,9 @@ export default function Navbar() {
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <div className="navBarLogin">
-              <Link to="/login" className="font-dm-sans text-sm font-medium">
-                Login
-              </Link>
-            </div>
-
+            <Link to="/login" className="font-dm-sans text-sm font-medium">
+              Login
+            </Link>
             <Link
               to="/register"
               className="btn-primary"

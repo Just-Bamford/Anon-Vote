@@ -238,7 +238,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
             minWidth: "auto",
           }}
         >
-          {isDeleting ? "Deleting" : "Delete"}
+          {isDeleting ? "Delete" : "Delete"}
         </button>
       </div>
 
