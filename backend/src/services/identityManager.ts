@@ -11,7 +11,7 @@ import { badRequest, notFound } from "../utils/errors";
 export async function issueToken(
   ballotId: string,
   voterIdentifier: string,
-): Promise<{ token: string; stellarTxId: string }> {
+): Promise<{ token: string; stellarTxId: string; weight: number }> {
   // Get ballot with eligibility list
   const ballot = await prisma.ballot.findUnique({
     where: { id: ballotId },
@@ -60,7 +60,7 @@ export async function issueToken(
 
   const result = await prisma.$transaction(async (tx) => {
     // Store token hash only
-    const voterToken = await tx.voterToken.create({
+    await tx.voterToken.create({
       data: { tokenHash, ballotId },
     });
 
@@ -75,7 +75,7 @@ export async function issueToken(
       data: { ballotId, eventType: "TOKEN_ISSUED" },
     });
 
-    return { auditEventId: auditEvent.id, weight: entry.weight };
+    return { auditEventId: auditEvent.id, weight: (entry as any).weight };
   });
 
   // Write to Stellar (required for transaction to complete)
