@@ -37,6 +37,8 @@ model Ballot {
   eligibilityListId String
   eligibilityList   EligibilityList @relation(fields: [eligibilityListId], references: [id])
   allowWeightedVoting Boolean       @default(false)
+  allowRankedChoice Boolean       @default(false)
+  maxRankings       Int?           // Max number of rankings allowed (for ranked-choice)
   createdAt         DateTime        @default(now())
   options           Option[]
   votes             Vote[]
@@ -94,6 +96,7 @@ model Vote {
   option           Option   @relation(fields: [optionId], references: [id])
   encryptedPayload String
   weight           Int      @default(1)
+  rank             Int?     // For ranked-choice: 1 = first choice, 2 = second, etc.
   stellarTxId      String?
   submittedAt      DateTime @default(now())
 }

@@ -9,6 +9,8 @@ export default function CreateBallotPage() {
   const [options, setOptions] = useState(["", ""]);
   const [deadline, setDeadline] = useState("");
   const [allowWeightedVoting, setAllowWeightedVoting] = useState(false);
+  const [allowRankedChoice, setAllowRankedChoice] = useState(false);
+  const [maxRankings, setMaxRankings] = useState<number>(3);
   const [file, setFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -53,6 +55,8 @@ export default function CreateBallotPage() {
         eligibilityListId,
         deadline: new Date(deadline).toISOString(),
         allowWeightedVoting,
+        allowRankedChoice,
+        maxRankings: allowRankedChoice ? maxRankings : undefined,
       });
       navigate("/dashboard");
     } catch (err: any) {
@@ -295,6 +299,56 @@ export default function CreateBallotPage() {
               </div>
             </label>
           </div>
+
+          {/* Ranked-Choice Voting Option */}
+          {allowWeightedVoting && (
+            <div>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={allowRankedChoice}
+                    onChange={(e) => setAllowRankedChoice(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <div className="w-12 h-7 bg-[var(--border-medium)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[var(--brand-primary)]"></div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-[var(--ink-secondary)]">
+                    Allow Ranked-Choice Voting
+                  </span>
+                  <span className="text-xs text-[var(--ink-muted)]">
+                    Voters can rank multiple options (1st, 2nd, 3rd choice)
+                  </span>
+                </div>
+              </label>
+              {allowRankedChoice && (
+                <div className="mt-3">
+                  <label className="block text-sm font-medium mb-1 text-[var(--ink-secondary)]">
+                    Max Rankings
+                  </label>
+                  <input
+                    type="number"
+                    min="2"
+                    max={options.length}
+                    value={maxRankings}
+                    onChange={(e) =>
+                      setMaxRankings(
+                        Math.min(
+                          Math.max(2, parseInt(e.target.value) || 2),
+                          options.length,
+                        ),
+                      )
+                    }
+                    className="input-field"
+                  />
+                  <p className="text-xs text-[var(--ink-muted)] mt-1">
+                    Maximum number of options voters can rank
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* File Upload */}
           <div>

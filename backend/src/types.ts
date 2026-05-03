@@ -30,6 +30,8 @@ export interface Ballot {
   deadline: string;
   eligibilityListId: string;
   allowWeightedVoting: boolean;
+  allowRankedChoice: boolean;
+  maxRankings?: number;
   createdAt: string;
   options: Option[];
   votesCast?: number;
@@ -57,6 +59,8 @@ export interface VoterToken {
   used: boolean;
   issuedAt: string;
   usedAt?: string;
+  delegatedFrom?: string;
+  delegatedTo?: string;
 }
 
 export interface Vote {
@@ -65,6 +69,7 @@ export interface Vote {
   optionId: string;
   encryptedPayload: string;
   weight: number;
+  rank?: number;
   stellarTxId?: string;
   submittedAt: string;
 }

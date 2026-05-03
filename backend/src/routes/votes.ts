@@ -11,7 +11,7 @@ router.post(
   strictRateLimiter,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { ballotId, voterToken, optionId, weight } = req.body;
+      const { ballotId, voterToken, optionId, weight, rank } = req.body;
       if (!ballotId || !voterToken || !optionId) {
         throw badRequest("ballotId, voterToken, and optionId are required");
       }
@@ -20,6 +20,7 @@ router.post(
         voterToken.trim(),
         optionId,
         weight || 1,
+        rank,
       );
       res
         .status(201)

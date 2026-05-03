@@ -73,6 +73,8 @@ export const createBallot = (data: {
   eligibilityListId: string;
   deadline: string;
   allowWeightedVoting?: boolean;
+  allowRankedChoice?: boolean;
+  maxRankings?: number;
 }) => api.post<ApiResponse<Ballot>>("/ballots", data);
 
 // Eligibility
