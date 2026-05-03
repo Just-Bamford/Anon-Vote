@@ -1,6 +1,5 @@
 import { prisma } from "../prisma/client";
-import { hashToken } from "../utils/crypto";
-import { badRequest, notFound } from "../utils/errors";
+import { badRequest } from "../utils/errors";
 
 /**
  * Delegate voting power from one token to another.
@@ -14,7 +13,6 @@ export async function delegateVote(
   // Find the delegator token
   const delegatorToken = await prisma.voterToken.findUnique({
     where: { tokenHash: delegatorTokenHash },
-    include: { ballot: true },
   });
 
   if (!delegatorToken) {
@@ -29,10 +27,13 @@ export async function delegateVote(
     throw badRequest("This token has already been used.");
   }
 
+  if (delegatorToken.delegatedTo) {
+    throw badRequest("This token has already delegated its vote.");
+  }
+
   // Find the delegate token
   const delegateToken = await prisma.voterToken.findUnique({
     where: { tokenHash: delegateTokenHash },
-    include: { ballot: true },
   });
 
   if (!delegateToken) {
@@ -47,26 +48,26 @@ export async function delegateVote(
     throw badRequest("Delegate token has already been used.");
   }
 
+  // Prevent self-delegation
+  if (delegatorToken.id === delegateToken.id) {
+    throw badRequest("Cannot delegate to yourself.");
+  }
+
   // Check for circular delegation
   if (delegateToken.delegatedTo === delegatorToken.id) {
     throw badRequest("Circular delegation detected.");
   }
 
-  // Check if delegate is already delegated to by someone else
-  const existingDelegation = await prisma.voterToken.findUnique({
-    where: { delegatedFrom: delegateToken.id },
-  });
-
-  if (existingDelegation) {
-    throw badRequest("Delegate already has votes delegated to them.");
-  }
-
   // Perform the delegation in a transaction
   await prisma.$transaction(async (tx) => {
-    // Mark delegator token as used (but not for voting, just for delegation)
+    // Mark delegator token as used for delegation
     await tx.voterToken.update({
       where: { id: delegatorToken.id },
-      data: { used: true, usedAt: new Date(), delegatedTo: delegateToken.id },
+      data: {
+        used: true,
+        usedAt: new Date(),
+        delegatedTo: delegateToken.id,
+      },
     });
 
     // Set delegate's delegatedFrom field
@@ -89,7 +90,6 @@ export async function getEffectiveVoter(
 ): Promise<{ effectiveToken: string; isDelegated: boolean }> {
   const token = await prisma.voterToken.findUnique({
     where: { tokenHash },
-    include: { ballot: true },
   });
 
   if (!token || token.ballotId !== ballotId) {
