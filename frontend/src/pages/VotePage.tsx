@@ -39,6 +39,7 @@ export default function VotePage() {
         ballotId: ballotId!,
         voterToken: token.trim(),
         optionId: selectedOption,
+        weight: ballot.allowWeightedVoting ? 1 : 1, // Default to 1 for now
       });
       setSuccess(true);
     } catch (err: any) {

@@ -11,11 +11,16 @@ router.post(
   strictRateLimiter,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { ballotId, voterToken, optionId } = req.body;
+      const { ballotId, voterToken, optionId, weight } = req.body;
       if (!ballotId || !voterToken || !optionId) {
         throw badRequest("ballotId, voterToken, and optionId are required");
       }
-      const result = await submitVote(ballotId, voterToken.trim(), optionId);
+      const result = await submitVote(
+        ballotId,
+        voterToken.trim(),
+        optionId,
+        weight || 1,
+      );
       res
         .status(201)
         .json({ data: { message: "Vote submitted successfully", ...result } });

@@ -29,6 +29,7 @@ export interface Ballot {
   status: BallotStatus;
   deadline: string;
   eligibilityListId: string;
+  allowWeightedVoting: boolean;
   createdAt: string;
   options: Option[];
   votesCast?: number;
@@ -56,6 +57,7 @@ export interface Vote {
   ballotId: string;
   optionId: string;
   encryptedPayload: string;
+  weight: number;
   stellarTxId?: string;
   submittedAt: string;
 }
@@ -90,6 +92,7 @@ export interface ApiResponse<T> {
 
 export interface TokenResponse {
   token: string;
+  weight: number;
 }
 
 export interface LoginResponse {

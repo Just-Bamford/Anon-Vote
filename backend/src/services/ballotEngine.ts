@@ -7,6 +7,7 @@ export async function createBallot(
   options: string[],
   eligibilityListId: string,
   deadline: Date,
+  allowWeightedVoting = false,
 ) {
   if (!topic?.trim()) throw badRequest("Ballot topic is required");
   if (!options || options.length < 2)
@@ -25,6 +26,7 @@ export async function createBallot(
       topic: topic.trim(),
       deadline,
       eligibilityListId,
+      allowWeightedVoting,
       options: {
         create: options.map((text) => ({ text: text.trim() })),
       },

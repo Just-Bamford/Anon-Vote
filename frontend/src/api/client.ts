@@ -72,6 +72,7 @@ export const createBallot = (data: {
   options: string[];
   eligibilityListId: string;
   deadline: string;
+  allowWeightedVoting?: boolean;
 }) => api.post<ApiResponse<Ballot>>("/ballots", data);
 
 // Eligibility
@@ -96,6 +97,7 @@ export const submitVote = (data: {
   ballotId: string;
   voterToken: string;
   optionId: string;
+  weight?: number;
 }) =>
   api.post<ApiResponse<{ message: string; voteId: string; ballotId: string }>>(
     "/votes",

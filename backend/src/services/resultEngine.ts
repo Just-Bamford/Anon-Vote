@@ -12,7 +12,7 @@ export async function tallyBallot(ballotId: string) {
 
   if (!ballot) throw notFound("Ballot not found");
 
-  // Count votes per option by decrypting each payload
+  // Count weighted votes per option by decrypting each payload
   const tally: Record<string, number> = {};
   ballot.options.forEach((o) => {
     tally[o.id] = 0;
@@ -25,23 +25,27 @@ export async function tallyBallot(ballotId: string) {
         config.ballotEncryptionKey,
       );
       if (tally[optionId] !== undefined) {
-        tally[optionId]++;
+        tally[optionId] += vote.weight;
       }
     } catch (err) {
       console.error(`[ResultEngine] Failed to decrypt vote ${vote.id}:`, err);
     }
   }
 
-  const totalVotes = ballot.votes.length;
+  // Calculate total weighted votes
+  const totalWeightedVotes = ballot.votes.reduce(
+    (sum, vote) => sum + vote.weight,
+    0,
+  );
   const usedTokenCount = await prisma.voterToken.count({
     where: { ballotId, used: true },
   });
 
-  const isConsistent = totalVotes === usedTokenCount;
+  const isConsistent = totalWeightedVotes === usedTokenCount;
 
   if (!isConsistent) {
     console.warn(
-      `[ResultEngine] Inconsistency detected for ballot ${ballotId}: votes=${totalVotes}, usedTokens=${usedTokenCount}`,
+      `[ResultEngine] Inconsistency detected for ballot ${ballotId}: weightedVotes=${totalWeightedVotes}, usedTokens=${usedTokenCount}`,
     );
   }
 
@@ -51,12 +55,12 @@ export async function tallyBallot(ballotId: string) {
     create: {
       ballotId,
       tallyJson: JSON.stringify(tally),
-      totalVotes,
+      totalVotes: totalWeightedVotes,
       isConsistent,
     },
     update: {
       tallyJson: JSON.stringify(tally),
-      totalVotes,
+      totalVotes: totalWeightedVotes,
       isConsistent,
     },
   });
@@ -70,7 +74,7 @@ export async function tallyBallot(ballotId: string) {
   const stellarTxId = await writeRecord({
     type: "RESULT_PUBLISHED",
     ballotId,
-    totalVotes,
+    totalVotes: totalWeightedVotes,
     isConsistent,
   });
 

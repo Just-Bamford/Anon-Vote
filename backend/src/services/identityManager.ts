@@ -75,7 +75,7 @@ export async function issueToken(
       data: { ballotId, eventType: "TOKEN_ISSUED" },
     });
 
-    return { auditEventId: auditEvent.id };
+    return { auditEventId: auditEvent.id, weight: entry.weight };
   });
 
   // Write to Stellar (required for transaction to complete)
@@ -97,5 +97,5 @@ export async function issueToken(
     data: { stellarTxId },
   });
 
-  return { token: rawToken, stellarTxId };
+  return { token: rawToken, stellarTxId, weight: result.weight };
 }

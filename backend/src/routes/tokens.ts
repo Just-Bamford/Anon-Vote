@@ -16,7 +16,9 @@ router.post(
         throw badRequest("ballotId and voterIdentifier are required");
       }
       const result = await issueToken(ballotId, voterIdentifier.trim());
-      res.status(200).json({ data: { token: result.token } });
+      res
+        .status(200)
+        .json({ data: { token: result.token, weight: result.weight } });
     } catch (err) {
       next(err);
     }

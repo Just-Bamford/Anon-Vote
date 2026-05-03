@@ -16,7 +16,13 @@ router.post(
   requireAuth,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { topic, options, eligibilityListId, deadline } = req.body;
+      const {
+        topic,
+        options,
+        eligibilityListId,
+        deadline,
+        allowWeightedVoting,
+      } = req.body;
       if (!topic || !options || !eligibilityListId || !deadline) {
         throw badRequest(
           "Missing required fields: topic, options, eligibilityListId, deadline",
@@ -28,6 +34,7 @@ router.post(
         options,
         eligibilityListId,
         new Date(deadline),
+        allowWeightedVoting,
       );
       res.status(201).json({ data: ballot });
     } catch (err) {

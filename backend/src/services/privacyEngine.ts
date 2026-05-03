@@ -13,6 +13,7 @@ export async function submitVote(
   ballotId: string,
   rawToken: string,
   optionId: string,
+  weight: number = 1,
 ): Promise<{ voteId: string; ballotId: string; stellarTxId: string }> {
   const tokenHash = hashToken(rawToken);
 
@@ -54,7 +55,7 @@ export async function submitVote(
   const vote = await prisma.$transaction(async (tx) => {
     // Create vote record — no token or identity stored
     const newVote = await tx.vote.create({
-      data: { ballotId, optionId, encryptedPayload },
+      data: { ballotId, optionId, encryptedPayload, weight },
     });
 
     // Mark token as used

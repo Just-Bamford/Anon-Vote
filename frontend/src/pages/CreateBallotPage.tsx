@@ -8,6 +8,7 @@ export default function CreateBallotPage() {
   const [topic, setTopic] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const [deadline, setDeadline] = useState("");
+  const [allowWeightedVoting, setAllowWeightedVoting] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -51,6 +52,7 @@ export default function CreateBallotPage() {
         options: options.map((o) => o.trim()).filter(Boolean),
         eligibilityListId,
         deadline: new Date(deadline).toISOString(),
+        allowWeightedVoting,
       });
       navigate("/dashboard");
     } catch (err: any) {
@@ -268,6 +270,30 @@ export default function CreateBallotPage() {
             {errors.deadline && (
               <p className="field-error">{errors.deadline}</p>
             )}
+          </div>
+
+          {/* Weighted Voting Option */}
+          <div>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={allowWeightedVoting}
+                  onChange={(e) => setAllowWeightedVoting(e.target.checked)}
+                  className="peer sr-only"
+                />
+                <div className="w-12 h-7 bg-[var(--border-medium)] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[var(--brand-primary)]"></div>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-[var(--ink-secondary)]">
+                  Allow Weighted Voting
+                </span>
+                <span className="text-xs text-[var(--ink-muted)]">
+                  Voters can have different vote weights based on their
+                  eligibility entry
+                </span>
+              </div>
+            </label>
           </div>
 
           {/* File Upload */}
