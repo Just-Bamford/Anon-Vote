@@ -4,6 +4,7 @@ import {
   createBallot,
   getBallotsByOrg,
   getBallotById,
+  updateBallot,
   deleteBallot,
 } from "../services/ballotEngine";
 import { badRequest } from "../utils/errors";
@@ -66,6 +67,26 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
     next(err);
   }
 });
+
+// PATCH /api/ballots/:id — Edit a ballot
+router.patch(
+  "/:id",
+  requireAuth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { topic, deadline, eligibilityListId, options } = req.body;
+      const updated = await updateBallot(req.params.id, req.organization!.id, {
+        ...(topic !== undefined && { topic }),
+        ...(deadline !== undefined && { deadline: new Date(deadline) }),
+        ...(eligibilityListId !== undefined && { eligibilityListId }),
+        ...(options !== undefined && { options }),
+      });
+      res.status(200).json({ data: updated });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // DELETE /api/ballots/:id — Delete a ballot
 router.delete(

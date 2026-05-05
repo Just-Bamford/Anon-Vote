@@ -4,6 +4,7 @@ import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import CreateBallotPage from "./pages/CreateBallotPage";
+import EditBallotPage from "./pages/EditBallotPage";
 import TokenRequestPage from "./pages/TokenRequestPage";
 import VotePage from "./pages/VotePage";
 import ResultsPage from "./pages/ResultsPage";
@@ -51,6 +52,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ballots/:ballotId/edit"
+            element={
+              <ProtectedRoute>
+                <EditBallotPage />
               </ProtectedRoute>
             }
           />

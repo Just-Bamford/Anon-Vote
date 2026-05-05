@@ -81,29 +81,28 @@ export async function submitVote(
     return { voteId: newVote.id, auditEventId: auditEvent.id };
   });
 
-  // Write to Stellar (required for transaction to complete)
+  // Write to Stellar — non-blocking, vote is recorded regardless
   const stellarTxId = await writeRecord({
     type: "VOTE_CAST",
     ballotId,
     voteId: vote.voteId,
   });
 
-  if (!stellarTxId) {
-    throw new Error(
-      "Stellar blockchain write failed. Vote could not be recorded.",
+  if (stellarTxId) {
+    await prisma.vote.update({
+      where: { id: vote.voteId },
+      data: { stellarTxId },
+    });
+
+    await prisma.auditEvent.update({
+      where: { id: vote.auditEventId },
+      data: { stellarTxId },
+    });
+  } else {
+    console.warn(
+      `[Stellar] VOTE_CAST write failed for vote ${vote.voteId} — vote still recorded`,
     );
   }
 
-  // Update vote and audit event with Stellar transaction ID
-  await prisma.vote.update({
-    where: { id: vote.voteId },
-    data: { stellarTxId },
-  });
-
-  await prisma.auditEvent.update({
-    where: { id: vote.auditEventId },
-    data: { stellarTxId },
-  });
-
-  return { voteId: vote.voteId, ballotId, stellarTxId };
+  return { voteId: vote.voteId, ballotId, stellarTxId: stellarTxId || "" };
 }

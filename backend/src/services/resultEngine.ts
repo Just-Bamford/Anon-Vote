@@ -70,7 +70,7 @@ export async function tallyBallot(ballotId: string) {
     data: { ballotId, eventType: "RESULT_PUBLISHED" },
   });
 
-  // Write to Stellar (required for transaction to complete)
+  // Write to Stellar — non-blocking, result is published regardless
   const stellarTxId = await writeRecord({
     type: "RESULT_PUBLISHED",
     ballotId,
@@ -78,22 +78,20 @@ export async function tallyBallot(ballotId: string) {
     isConsistent,
   });
 
-  if (!stellarTxId) {
-    throw new Error(
-      "Stellar blockchain write failed. Result could not be published.",
+  if (stellarTxId) {
+    await prisma.result.update({
+      where: { id: result.id },
+      data: { stellarTxId },
+    });
+    await prisma.auditEvent.update({
+      where: { id: auditEvent.id },
+      data: { stellarTxId },
+    });
+  } else {
+    console.warn(
+      `[Stellar] RESULT_PUBLISHED write failed for ballot ${ballotId} — result still published`,
     );
   }
-
-  // Update result and audit event with Stellar transaction ID
-  await prisma.result.update({
-    where: { id: result.id },
-    data: { stellarTxId },
-  });
-
-  await prisma.auditEvent.update({
-    where: { id: auditEvent.id },
-    data: { stellarTxId },
-  });
 
   return result;
 }

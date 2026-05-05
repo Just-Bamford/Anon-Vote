@@ -77,6 +77,16 @@ export const createBallot = (data: {
   maxRankings?: number;
 }) => api.post<ApiResponse<Ballot>>("/ballots", data);
 
+export const updateBallot = (
+  id: string,
+  data: {
+    topic?: string;
+    deadline?: string;
+    eligibilityListId?: string;
+    options?: string[];
+  },
+) => api.patch<ApiResponse<Ballot>>(`/ballots/${id}`, data);
+
 // Eligibility
 export const uploadEligibilityList = (file: File) => {
   const form = new FormData();
@@ -109,6 +119,9 @@ export const submitVote = (data: {
 // Results
 export const getResult = (ballotId: string) =>
   api.get<ApiResponse<Result>>(`/results/${ballotId}`);
+
+export const tallyBallot = (ballotId: string) =>
+  api.post<ApiResponse<Result>>(`/results/${ballotId}/tally`);
 
 // Audit
 export const getAudit = (ballotId: string) =>

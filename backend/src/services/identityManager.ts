@@ -20,6 +20,18 @@ export async function issueToken(
 
   // Don't reveal whether ballot exists if identifier not eligible
   const identifierHash = hashIdentifier(voterIdentifier);
+  console.log("[issueToken] ballotId:", ballotId);
+  console.log(
+    "[issueToken] voterIdentifier (raw):",
+    JSON.stringify(voterIdentifier),
+  );
+  console.log("[issueToken] identifierHash:", identifierHash);
+  console.log(
+    "[issueToken] ballot found:",
+    !!ballot,
+    "status:",
+    ballot?.status,
+  );
 
   if (!ballot || ballot.status === "CLOSED") {
     // Generic error — don't reveal ballot existence
@@ -36,6 +48,14 @@ export async function issueToken(
       },
     },
   });
+
+  console.log("[issueToken] eligibilityListId:", ballot.eligibilityListId);
+  console.log(
+    "[issueToken] entry found:",
+    !!entry,
+    "tokenIssued:",
+    entry?.tokenIssued,
+  );
 
   if (!entry) {
     // Generic error — don't reveal whether identifier was not found
@@ -78,24 +98,60 @@ export async function issueToken(
     return { auditEventId: auditEvent.id, weight: (entry as any).weight };
   });
 
-  // Write to Stellar (required for transaction to complete)
+  // Write to Stellar — non-blocking, token is issued regardless
   const stellarTxId = await writeRecord({
     type: "TOKEN_ISSUED",
     ballotId,
     auditEventId: result.auditEventId,
   });
 
-  if (!stellarTxId) {
-    throw new Error(
-      "Stellar blockchain write failed. Token issuance could not be recorded.",
+  if (stellarTxId) {
+    // Update audit event with Stellar transaction ID if write succeeded
+    await prisma.auditEvent.update({
+      where: { id: result.auditEventId },
+      data: { stellarTxId },
+    });
+  } else {
+    console.warn(
+      `[Stellar] TOKEN_ISSUED write failed for auditEvent ${result.auditEventId} — token still issued`,
     );
   }
 
-  // Update audit event with Stellar transaction ID
-  await prisma.auditEvent.update({
-    where: { id: result.auditEventId },
-    data: { stellarTxId },
+  return {
+    token: rawToken,
+    stellarTxId: stellarTxId || "",
+    weight: result.weight,
+  };
+}
+
+/**
+ * Reset all token issuance flags for a ballot's eligibility list.
+ * Admin function — allows voters to request tokens again.
+ * WARNING: Does not revoke already-issued tokens, only resets the issued flag.
+ */
+export async function resetBallotTokens(
+  ballotId: string,
+): Promise<{ resetCount: number }> {
+  const ballot = await prisma.ballot.findUnique({
+    where: { id: ballotId },
+    select: { eligibilityListId: true },
   });
 
-  return { token: rawToken, stellarTxId, weight: result.weight };
+  if (!ballot) {
+    throw notFound("Ballot not found");
+  }
+
+  const result = await prisma.eligibilityEntry.updateMany({
+    where: {
+      eligibilityListId: ballot.eligibilityListId,
+      tokenIssued: true,
+    },
+    data: { tokenIssued: false },
+  });
+
+  console.log(
+    `[resetBallotTokens] Reset ${result.count} entries for ballot ${ballotId}`,
+  );
+
+  return { resetCount: result.count };
 }

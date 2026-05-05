@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import type { Ballot } from "../types";
 import Toast from "./Toast";
-import { deleteBallot } from "../api/client";
+import { deleteBallot, tallyBallot } from "../api/client";
 
 interface Props {
   ballot: Ballot;
@@ -15,6 +15,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
     type: "success" | "error";
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isTallying, setIsTallying] = useState(false);
 
   const isOpen = ballot.status === "OPEN";
   const deadline = new Date(ballot.deadline);
@@ -30,6 +31,31 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
         message: "Failed to copy link. Please try again.",
         type: "error",
       });
+    }
+  };
+
+  const handleTally = async () => {
+    if (
+      !confirm(
+        "This will close the ballot and publish results. Voting will end immediately. Continue?",
+      )
+    )
+      return;
+    setIsTallying(true);
+    try {
+      await tallyBallot(ballot.id);
+      setToast({
+        message: "Ballot closed and results published.",
+        type: "success",
+      });
+      onBallotDeleted(); // refresh dashboard
+    } catch (err: any) {
+      setToast({
+        message: err?.response?.data?.message || "Failed to tally ballot.",
+        type: "error",
+      });
+    } finally {
+      setIsTallying(false);
     }
   };
 
@@ -202,6 +228,21 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
             Copy Voter Link
           </button>
         )}
+        {isOpen && (
+          <button
+            onClick={handleTally}
+            disabled={isTallying}
+            className="btn-ghost"
+            style={{
+              fontSize: "var(--text-sm)",
+              padding: "8px 12px",
+              minWidth: "auto",
+            }}
+            title="Close ballot and publish results now"
+          >
+            {isTallying ? "Tallying…" : "Close & Tally"}
+          </button>
+        )}
         {!isOpen && ballot.result && (
           <Link
             to={`/results/${ballot.id}`}
@@ -217,6 +258,17 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
             View Results
           </Link>
         )}
+        <Link
+          to={`/ballots/${ballot.id}/edit`}
+          className="btn-ghost"
+          style={{
+            fontSize: "var(--text-sm)",
+            padding: "8px 12px",
+            minWidth: "auto",
+          }}
+        >
+          Edit
+        </Link>
         <Link
           to={`/audit/${ballot.id}`}
           className="btn-ghost"
@@ -238,7 +290,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
             minWidth: "auto",
           }}
         >
-          {isDeleting ? "Delete" : "Delete"}
+          {isDeleting ? "Deleting…" : "Delete"}
         </button>
       </div>
 

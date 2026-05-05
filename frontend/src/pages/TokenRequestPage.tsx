@@ -42,10 +42,19 @@ export default function TokenRequestPage() {
         voterIdentifier: identifier.trim(),
       });
       setToken(res.data.data.token);
-    } catch {
-      setError(
-        "Unable to issue token. Please verify your identifier and try again.",
+    } catch (err: any) {
+      const serverMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Unknown error";
+      console.error(
+        "[TokenRequest] Error:",
+        err?.response?.status,
+        serverMsg,
+        err,
       );
+      setError(`Unable to issue token: ${serverMsg}`);
     } finally {
       setLoading(false);
     }

@@ -69,6 +69,74 @@ export async function getBallotById(id: string) {
   return ballot;
 }
 
+export async function updateBallot(
+  ballotId: string,
+  orgId: string,
+  data: {
+    topic?: string;
+    deadline?: Date;
+    eligibilityListId?: string;
+    options?: string[];
+  },
+) {
+  const ballot = await prisma.ballot.findUnique({
+    where: { id: ballotId },
+    include: { _count: { select: { votes: true } } },
+  });
+
+  if (!ballot) throw notFound("Ballot not found");
+  if (ballot.organizationId !== orgId)
+    throw badRequest("You can only edit your own ballots");
+  if (ballot.status === "CLOSED")
+    throw badRequest("Closed ballots cannot be edited");
+
+  const hasVotes = ballot._count.votes > 0;
+
+  if (hasVotes && (data.options || data.eligibilityListId)) {
+    throw badRequest(
+      "Options and eligibility list cannot be changed after votes have been cast",
+    );
+  }
+
+  if (data.topic !== undefined && !data.topic.trim())
+    throw badRequest("Ballot topic cannot be empty");
+  if (data.deadline !== undefined && data.deadline <= new Date())
+    throw badRequest("Deadline must be in the future");
+  if (data.options !== undefined && data.options.length < 2)
+    throw badRequest("At least two options are required");
+
+  if (data.eligibilityListId) {
+    const list = await prisma.eligibilityList.findUnique({
+      where: { id: data.eligibilityListId },
+    });
+    if (!list) throw badRequest("Eligibility list not found");
+  }
+
+  return prisma.$transaction(async (tx) => {
+    // Replace options if provided
+    if (data.options) {
+      await tx.option.deleteMany({ where: { ballotId } });
+      await tx.option.createMany({
+        data: data.options.map((text) => ({ ballotId, text: text.trim() })),
+      });
+    }
+
+    const updated = await tx.ballot.update({
+      where: { id: ballotId },
+      data: {
+        ...(data.topic && { topic: data.topic.trim() }),
+        ...(data.deadline && { deadline: data.deadline }),
+        ...(data.eligibilityListId && {
+          eligibilityListId: data.eligibilityListId,
+        }),
+      },
+      include: { options: true },
+    });
+
+    return updated;
+  });
+}
+
 export async function closeBallot(ballotId: string) {
   await prisma.ballot.update({
     where: { id: ballotId },
