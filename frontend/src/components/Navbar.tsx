@@ -3,6 +3,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/ThemeContext";
 import { useState, useRef, useEffect } from "react";
 import NotificationDropdown from "./NotificationDropdown";
+import { getTotalTokensIssued } from "../api/client";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -10,9 +11,22 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // User avatar dropdown state
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const [tokensIssued, setTokensIssued] = useState<number | null>(null);
+
+  // Fetch total tokens issued when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const fetch = () => {
+      getTotalTokensIssued()
+        .then((res) => setTokensIssued(res.data.data.tokensIssued))
+        .catch(() => {});
+    };
+    fetch();
+    const interval = setInterval(fetch, 60_000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -78,6 +92,26 @@ export default function Navbar() {
 
       <div className="flex items-center gap-4">
         <span className="navbar-network">STELLAR TESTNET</span>
+
+        {isAuthenticated && tokensIssued !== null && (
+          <span
+            title="Total tokens issued across all ballots"
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: "var(--text-xs)",
+              fontWeight: "var(--weight-medium)",
+              letterSpacing: "var(--tracking-wide)",
+              padding: "3px var(--space-3)",
+              borderRadius: "var(--radius-pill)",
+              background: "var(--brand-primary-pale)",
+              color: "var(--brand-primary)",
+              border: "1px solid var(--brand-primary-ring)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            TK {tokensIssued.toLocaleString()}
+          </span>
+        )}
 
         {isAuthenticated ? (
           <div className="flex items-center gap-2">

@@ -135,7 +135,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-3 mb-4">
+      <div className="grid grid-cols-4 gap-2 mb-4">
         <div
           style={{
             background: "var(--surface-base)",
@@ -178,7 +178,35 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
               marginBottom: "var(--space-1)",
             }}
           >
-            Votes Cast
+            Tokens
+          </p>
+          <p
+            style={{
+              color: "var(--brand-primary)",
+              fontWeight: "var(--weight-semibold)",
+              fontSize: "var(--text-base)",
+              fontFamily: "var(--font-mono)",
+            }}
+          >
+            {ballot.tokensIssued ?? "—"}
+          </p>
+        </div>
+        <div
+          style={{
+            background: "var(--surface-base)",
+            borderRadius: "var(--radius-md)",
+            padding: "var(--space-3)",
+            textAlign: "center",
+          }}
+        >
+          <p
+            style={{
+              color: "var(--ink-muted)",
+              fontSize: "var(--text-xs)",
+              marginBottom: "var(--space-1)",
+            }}
+          >
+            Votes
           </p>
           <p
             style={{

@@ -149,4 +149,7 @@ export const updateRateLimitSettings = (preset: string) =>
     ApiResponse<{ preset: string; maxAttempts: number; windowMinutes: number }>
   >("/admin/rate-limit", { preset });
 
+export const getTotalTokensIssued = () =>
+  api.get<ApiResponse<{ tokensIssued: number }>>("/admin/tokens-issued");
+
 export default api;

@@ -48,6 +48,20 @@ export async function getBallotsByOrg(orgId: string) {
     orderBy: { createdAt: "desc" },
   });
 
+  // Get tokens issued count per ballot from audit events
+  const ballotIds = ballots.map((b) => b.id);
+  const tokenCounts = await prisma.auditEvent.groupBy({
+    by: ["ballotId"],
+    where: {
+      ballotId: { in: ballotIds },
+      eventType: "TOKEN_ISSUED",
+    },
+    _count: { id: true },
+  });
+  const tokenCountMap = Object.fromEntries(
+    tokenCounts.map((t) => [t.ballotId, t._count.id]),
+  );
+
   return ballots.map((b) => ({
     id: b.id,
     topic: b.topic,
@@ -56,6 +70,7 @@ export async function getBallotsByOrg(orgId: string) {
     createdAt: b.createdAt,
     options: b.options,
     eligibleVoters: b.eligibilityList._count.entries,
+    tokensIssued: tokenCountMap[b.id] ?? 0,
     votesCast: b._count.votes,
   }));
 }

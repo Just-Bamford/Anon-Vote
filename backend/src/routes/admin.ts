@@ -1,5 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { requireAuth } from "../middleware/auth";
+import { prisma } from "../prisma/client";
 import {
   getRateLimitSettings,
   setRateLimitSettings,
@@ -9,6 +10,33 @@ import {
 import { badRequest } from "../utils/errors";
 
 const router = Router();
+
+// GET /api/admin/tokens-issued — Total tokens issued across all org ballots
+router.get(
+  "/tokens-issued",
+  requireAuth,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Get all ballot IDs for this org
+      const ballots = await prisma.ballot.findMany({
+        where: { organizationId: req.organization!.id },
+        select: { id: true },
+      });
+      const ballotIds = ballots.map((b) => b.id);
+
+      const count = await prisma.auditEvent.count({
+        where: {
+          ballotId: { in: ballotIds },
+          eventType: "TOKEN_ISSUED",
+        },
+      });
+
+      res.status(200).json({ data: { tokensIssued: count } });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 // GET /api/admin/rate-limit — Get current rate limit settings
 router.get("/rate-limit", requireAuth, (_req: Request, res: Response) => {
