@@ -1,8 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { useTheme } from "../context/ThemeContext";
-import { useAvatar } from "../hooks/useAvatar";
-import { useNotifications } from "../context/NotificationContext";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import {
   updateOrg,
   changePassword,
@@ -13,7 +9,13 @@ import {
 } from "../api/client";
 import Navbar from "../components/Navbar";
 import Toast from "../components/Toast";
-import GradientBackground from "../components/GradientBackground";
+import { useAuth } from "../hooks/useAuth";
+import { useTheme } from "../context/ThemeContext";
+import { useAvatar } from "../hooks/useAvatar";
+import { useNotifications } from "../context/NotificationContext";
+const GradientBackground = lazy(
+  () => import("../components/GradientBackground"),
+);
 import "./SettingsPage.css";
 
 type SettingsSection =
@@ -2228,7 +2230,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Live gradient preview — shown while on gradient settings */}
-      {gradientConfig.enabled && <GradientBackground config={gradientConfig} />}
+      {gradientConfig.enabled && (
+        <Suspense fallback={null}>
+          <GradientBackground config={gradientConfig} />
+        </Suspense>
+      )}
 
       {/* Global toast for avatar actions */}
       {toast && (
