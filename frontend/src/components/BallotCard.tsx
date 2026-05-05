@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Ballot } from "../types";
 import Toast from "./Toast";
 import { deleteBallot, tallyBallot } from "../api/client";
+import { useNotifications } from "../context/NotificationContext";
 
 interface Props {
   ballot: Ballot;
@@ -17,6 +18,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isTallying, setIsTallying] = useState(false);
 
+  const { addNotification } = useNotifications();
   const isOpen = ballot.status === "OPEN";
   const deadline = new Date(ballot.deadline);
   const tokenLink = `${window.location.origin}/vote/${ballot.id}/token`;
@@ -44,6 +46,11 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
     setIsTallying(true);
     try {
       await tallyBallot(ballot.id);
+      addNotification({
+        type: "results_published",
+        title: "Results published",
+        message: `"${ballot.topic}" has been closed and results are ready`,
+      });
       setToast({
         message: "Ballot closed and results published.",
         type: "success",

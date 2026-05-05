@@ -2,6 +2,14 @@ import { useRef, useEffect, useState } from "react";
 import { useNotifications } from "../context/NotificationContext";
 import "./Navbar.css";
 
+function timeAgo(date: Date): string {
+  const seconds = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (seconds < 60) return "Just now";
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
+}
+
 export default function NotificationDropdown() {
   const { notifications, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +35,7 @@ export default function NotificationDropdown() {
   }, [isOpen]);
 
   const recentNotifications = [...notifications]
-    .sort((a, b) => parseInt(a.time) - parseInt(b.time))
+    .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
     .slice(0, 10);
 
   return (
@@ -175,7 +183,7 @@ export default function NotificationDropdown() {
                       color: "var(--ink-muted)",
                     }}
                   >
-                    {notification.time}
+                    {timeAgo(notification.time)}
                   </span>
                 </div>
               ))

@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { uploadEligibilityList, createBallot } from "../api/client";
 import Navbar from "../components/Navbar";
 import { useTheme } from "../context/ThemeContext";
+import { useNotifications } from "../context/NotificationContext";
 
 export default function CreateBallotPage() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { addNotification } = useNotifications();
   const [topic, setTopic] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const [deadline, setDeadline] = useState("");
@@ -59,6 +61,11 @@ export default function CreateBallotPage() {
         allowWeightedVoting,
         allowRankedChoice,
         maxRankings: allowRankedChoice ? maxRankings : undefined,
+      });
+      addNotification({
+        type: "ballot_created",
+        title: "Ballot created",
+        message: `"${topic.trim()}" is now live and accepting votes`,
       });
       navigate("/dashboard");
     } catch (err: any) {
