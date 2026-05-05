@@ -104,6 +104,11 @@ export const requestToken = (data: {
   voterIdentifier: string;
 }) => api.post<ApiResponse<{ token: string }>>("/tokens", data);
 
+export const reissueToken = (data: {
+  ballotId: string;
+  voterIdentifier: string;
+}) => api.post<ApiResponse<{ token: string }>>("/tokens/reissue", data);
+
 // Votes
 export const submitVote = (data: {
   ballotId: string;

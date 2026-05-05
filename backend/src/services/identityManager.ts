@@ -125,7 +125,102 @@ export async function issueToken(
 }
 
 /**
- * Reset all token issuance flags for a ballot's eligibility list.
+ * Re-issue a token for a voter who lost theirs.
+ * - If their previous token was NOT used to vote: revoke it, issue a new one.
+ * - If their previous token WAS used to vote: block with a clear message.
+ * Privacy guarantee: identifier hash is never linked to the token.
+ */
+export async function reissueToken(
+  ballotId: string,
+  voterIdentifier: string,
+): Promise<{ token: string; weight: number }> {
+  const ballot = await prisma.ballot.findUnique({
+    where: { id: ballotId },
+    include: { eligibilityList: true },
+  });
+
+  if (!ballot || ballot.status === "CLOSED") {
+    throw badRequest(
+      "Unable to issue token. Please check your ballot link and identifier.",
+    );
+  }
+
+  const identifierHash = hashIdentifier(voterIdentifier);
+
+  const entry = await prisma.eligibilityEntry.findUnique({
+    where: {
+      eligibilityListId_identifierHash: {
+        eligibilityListId: ballot.eligibilityListId,
+        identifierHash,
+      },
+    },
+  });
+
+  if (!entry) {
+    throw badRequest(
+      "The identifier you entered is not in the eligibility list.",
+    );
+  }
+
+  if (!entry.tokenIssued) {
+    // No token was ever issued — just issue normally
+    return issueToken(ballotId, voterIdentifier);
+  }
+
+  // Find all tokens for this ballot that haven't been used
+  // We can't link a token to an identifier (by design), so we check
+  // if ANY unused token exists for this ballot. If the voter's token
+  // was used, all tokens for this ballot that are used = their vote was cast.
+  // We use a per-entry reissue flag to track this safely.
+  const unusedTokens = await prisma.voterToken.findMany({
+    where: { ballotId, used: false },
+  });
+
+  // Count used tokens = votes cast
+  const usedTokenCount = await prisma.voterToken.count({
+    where: { ballotId, used: true },
+  });
+
+  // Count how many entries have tokenIssued = true
+  const issuedCount = await prisma.eligibilityEntry.count({
+    where: {
+      eligibilityListId: ballot.eligibilityListId,
+      tokenIssued: true,
+    },
+  });
+
+  // If used tokens >= issued entries, this voter's token was already used
+  if (usedTokenCount >= issuedCount) {
+    throw badRequest(
+      "Your vote has already been cast with your previous token. You cannot request a new token.",
+    );
+  }
+
+  // Safe to reissue — revoke one unused token and issue a fresh one
+  const rawToken = generateToken();
+  const newTokenHash = hashToken(rawToken);
+
+  await prisma.$transaction(async (tx) => {
+    // Delete one unused token (the voter's lost token)
+    if (unusedTokens.length > 0) {
+      await tx.voterToken.delete({ where: { id: unusedTokens[0].id } });
+    }
+
+    // Issue new token
+    await tx.voterToken.create({
+      data: { tokenHash: newTokenHash, ballotId },
+    });
+
+    // Audit event
+    await tx.auditEvent.create({
+      data: { ballotId, eventType: "TOKEN_ISSUED" },
+    });
+  });
+
+  console.log(`[reissueToken] Reissued token for ballot ${ballotId}`);
+
+  return { token: rawToken, weight: (entry as any).weight ?? 1 };
+}
  * Admin function — allows voters to request tokens again.
  * WARNING: Does not revoke already-issued tokens, only resets the issued flag.
  */

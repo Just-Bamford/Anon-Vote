@@ -1,5 +1,9 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { issueToken, resetBallotTokens } from "../services/identityManager";
+import {
+  issueToken,
+  reissueToken,
+  resetBallotTokens,
+} from "../services/identityManager";
 import { strictRateLimiter } from "../middleware/rateLimiter";
 import { requireAuth } from "../middleware/auth";
 import { badRequest } from "../utils/errors";
@@ -24,6 +28,26 @@ router.post(
       }
       const result = await issueToken(ballotId, voterIdentifier.trim());
       console.log("[Tokens] Token issued successfully for ballot:", ballotId);
+      res
+        .status(200)
+        .json({ data: { token: result.token, weight: result.weight } });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+// POST /api/tokens/reissue — Re-issue a token for a voter who lost theirs
+router.post(
+  "/reissue",
+  strictRateLimiter,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { ballotId, voterIdentifier } = req.body;
+      if (!ballotId || !voterIdentifier) {
+        throw badRequest("ballotId and voterIdentifier are required");
+      }
+      const result = await reissueToken(ballotId, voterIdentifier.trim());
       res
         .status(200)
         .json({ data: { token: result.token, weight: result.weight } });
