@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/ThemeContext";
 import { useAvatar } from "../hooks/useAvatar";
+import { useNotifications } from "../context/NotificationContext";
 import {
   updateOrg,
   changePassword,
@@ -11,6 +12,7 @@ import {
   updateRateLimitSettings,
 } from "../api/client";
 import Navbar from "../components/Navbar";
+import Toast from "../components/Toast";
 import "./SettingsPage.css";
 
 type SettingsSection =
@@ -32,9 +34,15 @@ export default function SettingsPage() {
   const { orgName, loading: authLoading } = useAuth();
   const { theme, setTheme } = useTheme();
   const { avatarUrl, uploadAvatar, removeAvatar } = useAvatar();
+  const { addNotification } = useNotifications();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [avatarError, setAvatarError] = useState("");
   const [avatarSuccess, setAvatarSuccess] = useState(false);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: "success" | "error";
+  } | null>(null);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
   const [activeSection, setActiveSection] =
     useState<SettingsSection>("profile");
   const [orgDetails, setOrgDetails] = useState<OrganizationDetails | null>(
@@ -298,10 +306,22 @@ export default function SettingsPage() {
                       await uploadAvatar(file);
                       setAvatarSuccess(true);
                       setTimeout(() => setAvatarSuccess(false), 2500);
+                      setToast({
+                        message: "Profile picture updated successfully",
+                        type: "success",
+                      });
+                      addNotification({
+                        type: "ballot_created",
+                        title: "Profile picture updated",
+                        message: "Your new profile picture is now active",
+                      });
                     } catch (err: any) {
                       setAvatarError(err.message || "Failed to upload image");
+                      setToast({
+                        message: err.message || "Failed to upload image",
+                        type: "error",
+                      });
                     }
-                    // Reset input so same file can be re-selected
                     e.target.value = "";
                   }}
                 />
@@ -314,7 +334,7 @@ export default function SettingsPage() {
                   >
                     {avatarUrl ? "Change photo" : "Upload photo"}
                   </button>
-                  {avatarUrl && (
+                  {avatarUrl && !showRemoveConfirm && (
                     <span
                       className="profile-remove"
                       style={{
@@ -323,15 +343,82 @@ export default function SettingsPage() {
                         cursor: "pointer",
                         fontFamily: "var(--font-body)",
                       }}
-                      onClick={() => {
-                        removeAvatar();
-                        setAvatarSuccess(false);
-                      }}
+                      onClick={() => setShowRemoveConfirm(true)}
                     >
                       Remove
                     </span>
                   )}
                 </div>
+
+                {/* Remove confirmation */}
+                {showRemoveConfirm && (
+                  <div
+                    style={{
+                      marginTop: "var(--space-3)",
+                      padding: "var(--space-4)",
+                      background: "var(--semantic-error-light)",
+                      border: "1px solid var(--semantic-error-border)",
+                      borderRadius: "var(--radius-md)",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "var(--space-3)",
+                    }}
+                  >
+                    <p
+                      style={{
+                        fontSize: "var(--text-sm)",
+                        color: "var(--ink-primary)",
+                        margin: 0,
+                      }}
+                    >
+                      Remove your profile picture? Your initial letter will be
+                      shown instead.
+                    </p>
+                    <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                      <button
+                        className="btn-ghost"
+                        style={{
+                          minHeight: "36px",
+                          padding: "6px 14px",
+                          fontSize: "var(--text-sm)",
+                        }}
+                        onClick={() => setShowRemoveConfirm(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="btn-danger"
+                        style={{
+                          minHeight: "36px",
+                          padding: "6px 14px",
+                          fontSize: "var(--text-sm)",
+                          borderRadius: "var(--radius-md)",
+                          border: "none",
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          fontWeight: "var(--weight-semibold)",
+                          color: "white",
+                        }}
+                        onClick={() => {
+                          removeAvatar();
+                          setShowRemoveConfirm(false);
+                          setAvatarSuccess(false);
+                          setToast({
+                            message: "Profile picture removed",
+                            type: "success",
+                          });
+                          addNotification({
+                            type: "warning",
+                            title: "Profile picture removed",
+                            message: "Your profile picture has been removed",
+                          });
+                        }}
+                      >
+                        Yes, remove it
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {avatarError && (
                   <p
@@ -342,17 +429,6 @@ export default function SettingsPage() {
                     }}
                   >
                     {avatarError}
-                  </p>
-                )}
-                {avatarSuccess && (
-                  <p
-                    style={{
-                      color: "var(--semantic-success)",
-                      fontSize: "var(--text-xs)",
-                      marginTop: "var(--space-2)",
-                    }}
-                  >
-                    Profile picture updated
                   </p>
                 )}
                 <p
@@ -1691,6 +1767,15 @@ export default function SettingsPage() {
           <main className="settings-content-area">{renderContent()}</main>
         </div>
       </div>
+
+      {/* Global toast for avatar actions */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   );
 }
