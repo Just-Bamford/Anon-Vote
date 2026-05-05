@@ -179,6 +179,20 @@ export default function AuditTable({
               <th
                 style={{
                   textAlign: "left",
+                  padding: "var(--space-2) var(--space-4) var(--space-2) 0",
+                  color: "var(--ink-primary)",
+                  fontFamily: "var(--font-body)",
+                  fontWeight: "var(--weight-medium)",
+                  fontSize: "var(--text-xs)",
+                  textTransform: "uppercase",
+                  letterSpacing: "var(--tracking-wide)",
+                }}
+              >
+                Ledger Time
+              </th>
+              <th
+                style={{
+                  textAlign: "left",
                   padding: "var(--space-2) 0",
                   color: "var(--ink-primary)",
                   fontFamily: "var(--font-body)",
@@ -228,6 +242,21 @@ export default function AuditTable({
                     }}
                   >
                     {new Date(ev.createdAt).toLocaleString()}
+                  </td>
+                  <td
+                    style={{
+                      padding: "var(--space-3) var(--space-4) var(--space-3) 0",
+                      fontSize: "var(--text-xs)",
+                      fontFamily: "var(--font-mono)",
+                    }}
+                  >
+                    {ev.stellarLedgerAt ? (
+                      <span style={{ color: "var(--semantic-success)" }}>
+                        {new Date(ev.stellarLedgerAt).toLocaleString()}
+                      </span>
+                    ) : (
+                      <span style={{ color: "var(--ink-muted)" }}>—</span>
+                    )}
                   </td>
                   <td style={{ padding: "var(--space-3) 0" }}>
                     {ev.stellarTxId ? (

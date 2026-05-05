@@ -82,6 +82,7 @@ export interface AuditEvent {
   ballotId: string;
   eventType: AuditEventType;
   stellarTxId?: string;
+  stellarLedgerAt?: string; // Stellar network consensus timestamp
   createdAt: string;
 }
 

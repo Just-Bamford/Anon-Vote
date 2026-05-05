@@ -19,7 +19,12 @@ router.get(
         }),
         prisma.auditEvent.findMany({
           where: { ballotId },
-          select: { eventType: true, stellarTxId: true, createdAt: true },
+          select: {
+            eventType: true,
+            stellarTxId: true,
+            stellarLedgerAt: true,
+            createdAt: true,
+          },
           orderBy: { createdAt: "asc" },
         }),
       ]);

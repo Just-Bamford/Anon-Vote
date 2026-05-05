@@ -18,17 +18,22 @@ function getNetworkPassphrase(): string {
     : StellarSdk.Networks.TESTNET;
 }
 
+export interface StellarWriteResult {
+  txHash: string;
+  ledgerTimestamp: Date | null; // Stellar network consensus time
+}
+
 /**
  * Write an immutable record to the Stellar blockchain.
  * Uses manageData operation. Retries up to 3 times on failure.
- * Returns the transaction hash, or empty string if all retries fail (non-blocking).
+ * Returns txHash + ledger consensus timestamp, or empty string on failure.
  */
-export async function writeRecord(data: object): Promise<string> {
+export async function writeRecord(data: object): Promise<StellarWriteResult> {
   if (!config.stellarSecretKey) {
     console.warn(
       "[Stellar] No secret key configured, skipping blockchain write",
     );
-    return "";
+    return { txHash: "", ledgerTimestamp: null };
   }
 
   const MAX_RETRIES = 3;
@@ -59,7 +64,27 @@ export async function writeRecord(data: object): Promise<string> {
 
       transaction.sign(keypair);
       const result = await server.submitTransaction(transaction);
-      return result.hash;
+      const txHash = result.hash;
+
+      // Fetch ledger close time from Horizon — this is the Stellar consensus timestamp
+      let ledgerTimestamp: Date | null = null;
+      try {
+        const txDetails = await server
+          .transactions()
+          .transaction(txHash)
+          .call();
+        if (txDetails.created_at) {
+          ledgerTimestamp = new Date(txDetails.created_at);
+        }
+      } catch (fetchErr) {
+        console.warn("[Stellar] Could not fetch ledger timestamp:", fetchErr);
+      }
+
+      console.log(
+        `[Stellar] Write success — tx: ${txHash}, ledger time: ${ledgerTimestamp?.toISOString() ?? "unknown"}`,
+      );
+
+      return { txHash, ledgerTimestamp };
     } catch (err) {
       lastError = err;
       console.warn(
@@ -67,11 +92,11 @@ export async function writeRecord(data: object): Promise<string> {
         err,
       );
       if (attempt < MAX_RETRIES) {
-        await new Promise((r) => setTimeout(r, 1000 * attempt)); // backoff
+        await new Promise((r) => setTimeout(r, 1000 * attempt));
       }
     }
   }
 
   console.error("[Stellar] All retry attempts failed:", lastError);
-  return "";
+  return { txHash: "", ledgerTimestamp: null };
 }

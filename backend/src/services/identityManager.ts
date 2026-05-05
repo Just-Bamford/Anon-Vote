@@ -124,17 +124,19 @@ export async function issueToken(
   });
 
   // Write to Stellar — non-blocking, token is issued regardless
-  const stellarTxId = await writeRecord({
+  const stellarResult = await writeRecord({
     type: "TOKEN_ISSUED",
     ballotId,
     auditEventId: result.auditEventId,
   });
 
-  if (stellarTxId) {
-    // Update audit event with Stellar transaction ID if write succeeded
+  if (stellarResult.txHash) {
     await prisma.auditEvent.update({
       where: { id: result.auditEventId },
-      data: { stellarTxId },
+      data: {
+        stellarTxId: stellarResult.txHash,
+        stellarLedgerAt: stellarResult.ledgerTimestamp,
+      },
     });
   } else {
     console.warn(
@@ -144,7 +146,7 @@ export async function issueToken(
 
   return {
     token: rawToken,
-    stellarTxId: stellarTxId || "",
+    stellarTxId: stellarResult.txHash || "",
     weight: result.weight,
   };
 }

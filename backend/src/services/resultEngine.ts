@@ -71,21 +71,27 @@ export async function tallyBallot(ballotId: string) {
   });
 
   // Write to Stellar — non-blocking, result is published regardless
-  const stellarTxId = await writeRecord({
+  const stellarResult = await writeRecord({
     type: "RESULT_PUBLISHED",
     ballotId,
     totalVotes: totalWeightedVotes,
     isConsistent,
   });
 
-  if (stellarTxId) {
+  if (stellarResult.txHash) {
     await prisma.result.update({
       where: { id: result.id },
-      data: { stellarTxId },
+      data: {
+        stellarTxId: stellarResult.txHash,
+        stellarLedgerAt: stellarResult.ledgerTimestamp,
+      },
     });
     await prisma.auditEvent.update({
       where: { id: auditEvent.id },
-      data: { stellarTxId },
+      data: {
+        stellarTxId: stellarResult.txHash,
+        stellarLedgerAt: stellarResult.ledgerTimestamp,
+      },
     });
   } else {
     console.warn(
