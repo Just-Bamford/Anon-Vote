@@ -19,9 +19,13 @@ export function useAuth(): AuthState & { logout: () => Promise<void> } {
   });
 
   useEffect(() => {
-    // Don't check auth on login/register pages
+    // Don't check auth on public pages
     const currentPath = window.location.pathname;
-    if (currentPath === "/login" || currentPath === "/register") {
+    if (
+      currentPath === "/login" ||
+      currentPath === "/register" ||
+      currentPath === "/"
+    ) {
       setState({
         isAuthenticated: false,
         orgName: null,

@@ -14,7 +14,14 @@ const api = axios.create({
 });
 
 // Public voter routes — never redirect to login from these
-const PUBLIC_PATHS = ["/vote/", "/results/", "/audit/", "/login", "/register"];
+const PUBLIC_PATHS = [
+  "/vote/",
+  "/results/",
+  "/audit/",
+  "/login",
+  "/register",
+  "/",
+];
 
 // Redirect to login on 401 — but only from protected admin pages
 api.interceptors.response.use(
