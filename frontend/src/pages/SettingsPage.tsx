@@ -762,7 +762,8 @@ export default function SettingsPage() {
                   { name: "Emerald", hex: "#059669" },
                   { name: "Violet", hex: "#7c3aed" },
                   { name: "Rose", hex: "#e11d48" },
-                  { name: "Amber", hex: "#d97706" },
+                  { name: "Apple Blossom", hex: "#ba5a3c" },
+                  { name: "Lime", hex: "#81b800" },
                 ].map((color) => (
                   <button
                     key={color.name}
