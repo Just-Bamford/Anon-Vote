@@ -40,16 +40,29 @@ export async function createBallot(
     .findUnique({ where: { id: orgId }, select: { email: true, name: true } })
     .then((org) => {
       if (org) {
+        console.log(`[Email] Sending ballot created email to ${org.email}`);
         sendBallotCreatedEmail({
           to: org.email,
           orgName: org.name,
           topic: ballot.topic,
           deadline: ballot.deadline,
           ballotId: ballot.id,
-        });
+        })
+          .then(() =>
+            console.log(
+              `[Email] Ballot created email delivered to ${org.email}`,
+            ),
+          )
+          .catch((err) =>
+            console.error("[Email] Ballot created send error:", err),
+          );
+      } else {
+        console.warn("[Email] Org not found for ballot created email");
       }
     })
-    .catch(() => {});
+    .catch((err) =>
+      console.error("[Email] Failed to fetch org for email:", err),
+    );
 
   return ballot;
 }

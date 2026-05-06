@@ -13,16 +13,19 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Redirect to login on 401
+// Public voter routes — never redirect to login from these
+const PUBLIC_PATHS = ["/vote/", "/results/", "/audit/", "/login", "/register"];
+
+// Redirect to login on 401 — but only from protected admin pages
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    // Only redirect on 401 if there's a response (not a network error)
-    if (
-      err.response?.status === 401 &&
-      !window.location.pathname.includes("/login")
-    ) {
-      window.location.href = "/login";
+    if (err.response?.status === 401) {
+      const path = window.location.pathname;
+      const isPublicPath = PUBLIC_PATHS.some((p) => path.includes(p));
+      if (!isPublicPath) {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(err);
   },

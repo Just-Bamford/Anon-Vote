@@ -135,7 +135,7 @@ export async function sendBallotCreatedEmail(params: {
   });
 
   try {
-    await client.emails.send({
+    const response = await client.emails.send({
       from: config.emailFrom,
       to: params.to,
       subject: `Ballot created: "${params.topic}"`,
@@ -146,9 +146,15 @@ export async function sendBallotCreatedEmail(params: {
         voterLink,
       ),
     });
-    console.log(`[Email] Ballot created email sent to ${params.to}`);
+    console.log(
+      `[Email] Ballot created email sent to ${params.to} — response:`,
+      JSON.stringify(response),
+    );
   } catch (err) {
-    console.error("[Email] Failed to send ballot created email:", err);
+    console.error(
+      "[Email] Failed to send ballot created email:",
+      JSON.stringify(err),
+    );
   }
 }
 
