@@ -855,87 +855,7 @@ body {
 }
 
 /* ============================================================
-   12. NAVBAR
-   ============================================================ */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  background-color: var(--surface-overlay);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  border-bottom: 1px solid var(--border-soft);
-  padding: 0 var(--space-10);
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition:
-    background-color var(--transition-slow),
-    border-color var(--transition-slow);
-}
-
-/* BMW M dark mode: drop blur, go pure black — blur on black looks muddy */
-[data-theme="dark"] .navbar {
-  background-color: var(--surface-overlay);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border-soft);
-}
-
-.navbar-logo {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  text-decoration: none;
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--tracking-tight);
-  color: #1d1d1f;
-}
-
-.navbar-logo svg {
-  width: 20px;
-  height: 20px;
-  fill: #1d1d1f;
-}
-
-[data-theme="dark"] .navbar-logo {
-  color: #ffffff;
-}
-
-[data-theme="dark"] .navbar-logo svg {
-  fill: #ffffff;
-}
-
-.theme-toggle {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-sm);
-  color: var(--ink-secondary);
-  cursor: pointer;
-  transition:
-    border-color var(--transition-base),
-    background-color var(--transition-base),
-    color var(--transition-base);
-}
-
-.theme-toggle:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-  background-color: var(--brand-primary-pale);
-}
-
-/* ============================================================
-   13. STAT CARDS (Dashboard)
+   12. STAT CARDS (Dashboard)
    ============================================================ */
 .stat-card {
   padding: var(--space-6);
@@ -1065,10 +985,6 @@ body {
     --text-xl: 20px;
   }
 
-  .navbar {
-    padding: 0 var(--space-4);
-  }
-
   /* Reduce page-wrapper side padding on tablet */
   .page-wrapper {
     padding-left: var(--space-4);
@@ -1097,27 +1013,6 @@ body {
     padding: var(--space-4) var(--space-4);
     align-items: flex-start;
     padding-top: 80px;
-  }
-
-  /* Navbar */
-  .navbar {
-    padding: 0 var(--space-4);
-  }
-
-  /* Navbar — hide TK chip and network pill on very small screens */
-  .navbar-network {
-    display: none;
-  }
-
-  /* Dropdowns — full width on mobile to prevent overflow */
-  .navbar-dropdown {
-    position: fixed !important;
-    top: 56px !important;
-    left: var(--space-4) !important;
-    right: var(--space-4) !important;
-    width: auto !important;
-    min-width: unset !important;
-    max-width: unset !important;
   }
 
   /* Cards — reduce padding */

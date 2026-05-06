@@ -1,5 +1,10 @@
 /* Navbar Component Styles */
 .navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   background-color: var(--surface-overlay);
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -31,11 +36,44 @@
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-tight);
+  color: #1d1d1f;
 }
 
 .navbar-logo svg {
   width: 20px;
   height: 20px;
+  fill: #1d1d1f;
+}
+
+[data-theme="dark"] .navbar-logo {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .navbar-logo svg {
+  fill: #ffffff;
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--ink-secondary);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base),
+    color var(--transition-base);
+}
+
+.theme-toggle:hover {
+  border-color: var(--brand-primary);
+  color: var(--brand-primary);
+  background-color: var(--brand-primary-pale);
 }
 
 .navbar-network {
@@ -481,13 +519,24 @@
 /* ============================================================
    Mobile Responsive — Navbar
    ============================================================ */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 var(--space-4);
+  }
+}
+
 @media (max-width: 640px) {
-  /* Hide TK token chip on mobile */
-  .navbar-token-chip {
+  .navbar {
+    padding: 0 var(--space-4);
+  }
+
+  /* Hide TK token chip and network pill on mobile */
+  .navbar-token-chip,
+  .navbar-network {
     display: none;
   }
 
-  /* Profile dropdown — full width */
+  /* Dropdowns — full width on mobile to prevent overflow */
   .navbar-dropdown {
     position: fixed;
     top: 56px;
