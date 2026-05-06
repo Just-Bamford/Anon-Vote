@@ -1,16 +1,18 @@
 /**
  * Soroban Smart Contract Service
  *
- * STATUS: Stub — ready to wire to a deployed contract.
+ * STATUS: Contract written (contracts/anonvote/src/lib.rs) — needs deployment.
  *
  * The manageData-based stellarService.ts is the active blockchain layer.
- * This service is prepared for when a Soroban contract is deployed on testnet/mainnet.
+ * This service is ready to wire once the Soroban contract is deployed.
  *
  * TO ACTIVATE:
- * 1. Write a Soroban contract in Rust (see /contracts/ when created)
- * 2. Deploy with: stellar contract deploy --wasm target/wasm32-unknown-unknown/release/anonvote.wasm --network testnet
- * 3. Set SOROBAN_CONTRACT_ID in .env
- * 4. Call invokeContract() from privacyEngine or resultEngine as needed
+ * 1. Install Rust + Stellar CLI (see contracts/README.md)
+ * 2. Build: cd contracts/anonvote && cargo build --target wasm32-unknown-unknown --release
+ * 3. Deploy: stellar contract deploy --wasm target/wasm32-unknown-unknown/release/anonvote.wasm --network testnet
+ * 4. Initialize: stellar contract invoke --id <ID> -- initialize --admin <PUBLIC_KEY>
+ * 5. Set SOROBAN_CONTRACT_ID=<ID> in backend/.env
+ * 6. Call the helpers below from ballotEngine, identityManager, privacyEngine, resultEngine
  *
  * CORRECT SDK USAGE (stellar-sdk v12):
  * - RPC server:     new StellarSdk.SorobanRpc.Server(rpcUrl)
@@ -222,4 +224,94 @@ export async function readContract(
     console.error("[Soroban] readContract error:", err);
     return null;
   }
+}
+
+// ── AnonVote contract helpers ─────────────────────────────────────────────────
+// These wrap invokeContract/readContract with the specific AnonVote contract
+// methods. Set SOROBAN_CONTRACT_ID in .env to activate.
+
+const CONTRACT_ID = process.env.SOROBAN_CONTRACT_ID || "";
+
+/**
+ * Record a ballot creation on-chain.
+ * Call from ballotEngine.createBallot() after the ballot is saved to DB.
+ */
+export async function sorobanRecordBallot(
+  ballotIdHash: string,
+): Promise<string> {
+  if (!CONTRACT_ID) return "";
+  const result = await invokeContract(CONTRACT_ID, "record_ballot", [
+    { value: ballotIdHash, type: "string" },
+  ]);
+  return result.txHash;
+}
+
+/**
+ * Record a token issuance on-chain.
+ * Call from identityManager.issueToken() after the token is issued.
+ */
+export async function sorobanRecordToken(
+  ballotIdHash: string,
+): Promise<string> {
+  if (!CONTRACT_ID) return "";
+  const result = await invokeContract(CONTRACT_ID, "record_token", [
+    { value: ballotIdHash, type: "string" },
+  ]);
+  return result.txHash;
+}
+
+/**
+ * Record a vote cast on-chain.
+ * Call from privacyEngine.submitVote() after the vote is saved to DB.
+ */
+export async function sorobanRecordVote(ballotIdHash: string): Promise<string> {
+  if (!CONTRACT_ID) return "";
+  const result = await invokeContract(CONTRACT_ID, "record_vote", [
+    { value: ballotIdHash, type: "string" },
+  ]);
+  return result.txHash;
+}
+
+/**
+ * Record a result publication on-chain.
+ * Call from resultEngine.tallyBallot() after the result is saved to DB.
+ * resultHash: SHA-256 of the tally JSON string.
+ */
+export async function sorobanRecordResult(
+  ballotIdHash: string,
+  resultHash: string,
+): Promise<string> {
+  if (!CONTRACT_ID) return "";
+  const result = await invokeContract(CONTRACT_ID, "record_result", [
+    { value: ballotIdHash, type: "string" },
+    { value: resultHash, type: "string" },
+  ]);
+  return result.txHash;
+}
+
+/**
+ * Read on-chain audit counts for a ballot (view call — no transaction).
+ */
+export async function sorobanGetAuditCounts(ballotIdHash: string): Promise<{
+  tokensIssued: number;
+  votesCast: number;
+  isConsistent: boolean;
+} | null> {
+  if (!CONTRACT_ID) return null;
+  const [tokens, votes, consistent] = await Promise.all([
+    readContract(CONTRACT_ID, "get_tokens_issued", [
+      { value: ballotIdHash, type: "string" },
+    ]),
+    readContract(CONTRACT_ID, "get_votes_cast", [
+      { value: ballotIdHash, type: "string" },
+    ]),
+    readContract(CONTRACT_ID, "is_consistent", [
+      { value: ballotIdHash, type: "string" },
+    ]),
+  ]);
+  return {
+    tokensIssued: (tokens as number) ?? 0,
+    votesCast: (votes as number) ?? 0,
+    isConsistent: (consistent as boolean) ?? false,
+  };
 }
