@@ -193,12 +193,12 @@ export default function LandingPage() {
         <h1
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "48px",
+            fontSize: "60px",
             fontWeight: "var(--weight-bold)",
-            letterSpacing: "var(--tracking-tighter)",
+            letterSpacing: "var(--tracking-tight)",
             lineHeight: 1.1,
             color: "#ffffff",
-            maxWidth: "1200px",
+            maxWidth: "800px",
             marginBottom: "var(--space-5)",
           }}
         >
@@ -212,9 +212,9 @@ export default function LandingPage() {
         {/* Sub */}
         <p
           style={{
-            fontSize: "var(--text-sm)",
+            fontSize: "var(--text-base)",
             color: "rgba(255,255,255,0.45)",
-            maxWidth: "400px",
+            maxWidth: "550px",
             lineHeight: 1.7,
             marginBottom: "var(--space-8)",
           }}
@@ -364,15 +364,15 @@ export default function LandingPage() {
               marginBottom: "var(--space-4)",
             }}
           >
-            How it works
+            ⟪ How it works ⟫
           </p>
           <h2
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "32px",
+              fontSize: "var(--text-3xl)",
               fontWeight: "var(--weight-bold)",
               letterSpacing: "var(--tracking-tight)",
-              color: "#ffffff",
+              color: "var(--ink-secondary)",
             }}
           >
             From ballot to verified result
@@ -493,15 +493,15 @@ export default function LandingPage() {
                 marginBottom: "var(--space-4)",
               }}
             >
-              Who it's for
+              ⟪ Who it's for ⟫
             </p>
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "32px",
+                fontSize: "var(--text-3xl)",
                 fontWeight: "var(--weight-bold)",
                 letterSpacing: "var(--tracking-tight)",
-                color: "#ffffff",
+                color: "var(--ink-secondary)",
               }}
             >
               Built for any organization
@@ -636,15 +636,15 @@ export default function LandingPage() {
                 marginBottom: "var(--space-4)",
               }}
             >
-              FAQ
+              ⟪ FAQ ⟫
             </p>
             <h2
               style={{
                 fontFamily: "var(--font-display)",
-                fontSize: "32px",
+                fontSize: "var(--text-3xl)",
                 fontWeight: "var(--weight-bold)",
                 letterSpacing: "var(--tracking-tight)",
-                color: "#ffffff",
+                color: "var(--ink-secondary)",
               }}
             >
               Common questions
@@ -667,8 +667,8 @@ export default function LandingPage() {
                   overflow: "hidden",
                   background:
                     openFaq === i
-                      ? "rgba(28,126,214,0.04)"
-                      : "rgba(255,255,255,0.02)",
+                      ? "var(--surface-base)"
+                      : "var(--surface-raised)",
                   transition: "background var(--transition-base)",
                 }}
               >
@@ -741,7 +741,7 @@ export default function LandingPage() {
         <h2
           style={{
             fontFamily: "var(--font-display)",
-            fontSize: "32px",
+            fontSize: "var(--text-xl)",
             fontWeight: "var(--weight-bold)",
             letterSpacing: "var(--tracking-tight)",
             color: "#ffffff",
