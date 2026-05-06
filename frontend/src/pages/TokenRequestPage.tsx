@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getBallot, requestToken, reissueToken } from "../api/client";
 import Navbar from "../components/Navbar";
 import TokenDisplay from "../components/TokenDisplay";
@@ -13,9 +13,11 @@ export default function TokenRequestPage() {
   const [ballotError, setBallotError] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [token, setToken] = useState("");
+  const [existingToken, setExistingToken] = useState(""); // for "I still have my token" input
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [pageState, setPageState] = useState<PageState>("form");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!ballotId) return;
@@ -179,81 +181,185 @@ export default function TokenRequestPage() {
               <span>A token was already issued for this identifier.</span>
             </div>
 
-            <div
-              style={{
-                color: "var(--ink-secondary)",
-                fontSize: "var(--text-sm)",
-              }}
-            >
-              <p style={{ marginBottom: "var(--space-2)" }}>
-                Did you lose your token? You can request a replacement.
+            {/* Option 1 — still have the token */}
+            <div>
+              <p
+                style={{
+                  fontSize: "var(--text-sm)",
+                  fontWeight: "var(--weight-semibold)",
+                  color: "var(--ink-primary)",
+                  marginBottom: "var(--space-2)",
+                }}
+              >
+                Still have your token?
               </p>
               <p
                 style={{
-                  color: "var(--ink-muted)",
                   fontSize: "var(--text-xs)",
+                  color: "var(--ink-muted)",
+                  marginBottom: "var(--space-3)",
                 }}
               >
-                Your old token will be revoked and a new one issued — but only
-                if you haven't voted yet.
+                Paste it below and go straight to voting.
               </p>
+              <div style={{ display: "flex", gap: "var(--space-2)" }}>
+                <div className="input-wrapper" style={{ flex: 1 }}>
+                  <span className="input-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    value={existingToken}
+                    onChange={(e) => setExistingToken(e.target.value)}
+                    className="input-field has-icon font-mono"
+                    placeholder="Paste your token here"
+                    aria-label="Your existing voting token"
+                    style={{ fontSize: "var(--text-sm)" }}
+                  />
+                </div>
+                <button
+                  onClick={() => {
+                    if (existingToken.trim()) {
+                      navigate(`/vote/${ballotId}`, {
+                        state: { token: existingToken.trim() },
+                      });
+                    }
+                  }}
+                  disabled={!existingToken.trim()}
+                  className="btn-primary"
+                  style={{
+                    minHeight: "44px",
+                    padding: "8px 16px",
+                    fontSize: "var(--text-sm)",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Proceed to Vote →
+                </button>
+              </div>
             </div>
 
-            {error && (
+            {/* Divider */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "var(--space-3)",
+              }}
+            >
               <div
-                className="message message-error"
-                role="alert"
-                aria-live="assertive"
-              >
-                <span className="message-icon" aria-hidden="true">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </span>
-                <span>{error}</span>
-              </div>
-            )}
-
-            <div style={{ display: "flex", gap: "var(--space-3)" }}>
-              <button
-                onClick={() => {
-                  setPageState("form");
-                  setError("");
+                style={{
+                  flex: 1,
+                  height: "1px",
+                  background: "var(--border-soft)",
                 }}
-                className="btn-ghost"
-                aria-label="Go back to identifier form"
-                style={{ flex: 1, minHeight: "48px" }}
+              />
+              <span
+                style={{
+                  fontSize: "var(--text-xs)",
+                  color: "var(--ink-muted)",
+                  whiteSpace: "nowrap",
+                }}
               >
-                Back
-              </button>
-              <button
-                onClick={handleReissue}
-                disabled={loading}
-                className="btn-primary"
-                aria-label="Request a replacement token"
-                style={{ flex: 2, minHeight: "48px" }}
+                or if you lost it
+              </span>
+              <div
+                style={{
+                  flex: 1,
+                  height: "1px",
+                  background: "var(--border-soft)",
+                }}
+              />
+            </div>
+
+            {/* Option 2 — request a new token */}
+            <div>
+              <p
+                style={{
+                  fontSize: "var(--text-sm)",
+                  fontWeight: "var(--weight-semibold)",
+                  color: "var(--ink-primary)",
+                  marginBottom: "var(--space-1)",
+                }}
               >
-                {loading ? (
-                  <span className="loading-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
+                Lost your token?
+              </p>
+              <p
+                style={{
+                  fontSize: "var(--text-xs)",
+                  color: "var(--ink-muted)",
+                  marginBottom: "var(--space-3)",
+                }}
+              >
+                Your old token will be revoked and a new one issued — only if
+                you haven't voted yet.
+              </p>
+
+              {error && (
+                <div
+                  className="message message-error"
+                  role="alert"
+                  aria-live="assertive"
+                  style={{ marginBottom: "var(--space-3)" }}
+                >
+                  <span className="message-icon" aria-hidden="true">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
                   </span>
-                ) : (
-                  "Yes, send me a new token"
-                )}
-              </button>
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <div style={{ display: "flex", gap: "var(--space-3)" }}>
+                <button
+                  onClick={() => {
+                    setPageState("form");
+                    setError("");
+                    setExistingToken("");
+                  }}
+                  className="btn-ghost"
+                  aria-label="Go back to identifier form"
+                  style={{ flex: 1, minHeight: "48px" }}
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleReissue}
+                  disabled={loading}
+                  className="btn-primary"
+                  aria-label="Request a replacement token"
+                  style={{ flex: 2, minHeight: "48px" }}
+                >
+                  {loading ? (
+                    <span className="loading-dots">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </span>
+                  ) : (
+                    "Yes, send me a new token"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         ) : (
