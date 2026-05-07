@@ -14,6 +14,18 @@ import { useAuth } from "../hooks/useAuth";
 import { useTheme } from "../context/ThemeContext";
 import { useAvatar } from "../hooks/useAvatar";
 import { useNotifications } from "../context/NotificationContext";
+import {
+  CheckIcon,
+  InfoCircledIcon,
+  ExclamationTriangleIcon,
+  SunIcon,
+  MoonIcon,
+  ExternalLinkIcon,
+  PersonIcon,
+  LockClosedIcon,
+  CheckCircledIcon,
+  ChatBubbleIcon,
+} from "@radix-ui/react-icons";
 import "./SettingsPage.css";
 
 type SettingsSection =
@@ -457,20 +469,7 @@ export default function SettingsPage() {
                   style={{ marginBottom: "var(--space-4)" }}
                 >
                   <span className="message-icon">
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <CheckIcon width="16" height="16" />
                   </span>
                   <span>Changes saved successfully</span>
                 </div>
@@ -482,20 +481,7 @@ export default function SettingsPage() {
                   style={{ marginBottom: "var(--space-4)" }}
                 >
                   <span className="message-icon">
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <InfoCircledIcon width="16" height="16" />
                   </span>
                   <span>Failed to save changes. Please try again.</span>
                 </div>
@@ -669,37 +655,13 @@ export default function SettingsPage() {
                   onClick={() => setTheme("light")}
                 >
                   <div className="theme-card-icon">
-                    <svg
-                      className="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                      />
-                    </svg>
+                    <SunIcon className="w-8 h-8" />
                   </div>
                   <span className="theme-card-label">Light</span>
                   <p className="theme-card-description">Clean and bright</p>
                   {theme === "light" && (
                     <span className="theme-card-checkmark">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                      <CheckIcon className="w-5 h-5" />
                     </span>
                   )}
                 </button>
@@ -710,37 +672,13 @@ export default function SettingsPage() {
                   onClick={() => setTheme("dark")}
                 >
                   <div className="theme-card-icon">
-                    <svg
-                      className="w-8 h-8"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                      />
-                    </svg>
+                    <MoonIcon className="w-8 h-8" />
                   </div>
                   <span className="theme-card-label">Dark</span>
                   <p className="theme-card-description">Easy on the eyes</p>
                   {theme === "dark" && (
                     <span className="theme-card-checkmark">
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                      <CheckIcon className="w-5 h-5" />
                     </span>
                   )}
                 </button>
@@ -792,19 +730,7 @@ export default function SettingsPage() {
                   >
                     {selectedColor === color.hex && (
                       <span className="color-swatch-checkmark">
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
+                        <CheckIcon className="w-4 h-4" />
                       </span>
                     )}
                   </button>
@@ -904,20 +830,7 @@ export default function SettingsPage() {
                     className="btn-ghost"
                     style={{ minHeight: "36px", padding: "8px 12px" }}
                   >
-                    <svg
-                      width="14"
-                      height="14"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
+                    <ExternalLinkIcon width="14" height="14" />
                   </a>
                 </div>
               </div>
@@ -1025,20 +938,7 @@ export default function SettingsPage() {
 
             <div className="message message-warning">
               <span className="message-icon">
-                <svg
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
-                </svg>
+                <ExclamationTriangleIcon width="16" height="16" />
               </span>
               <span>
                 Switching to Mainnet will use real XLM for transactions. Make
@@ -1108,20 +1008,7 @@ export default function SettingsPage() {
                   style={{ marginBottom: "var(--space-4)" }}
                 >
                   <span className="message-icon">
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <CheckIcon width="16" height="16" />
                   </span>
                   <span>Password updated successfully</span>
                 </div>
@@ -1132,20 +1019,7 @@ export default function SettingsPage() {
                   style={{ marginBottom: "var(--space-4)" }}
                 >
                   <span className="message-icon">
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <InfoCircledIcon width="16" height="16" />
                   </span>
                   <span>Failed to update password. Please try again.</span>
                 </div>
@@ -1280,20 +1154,7 @@ export default function SettingsPage() {
                   style={{ marginBottom: "var(--space-3)" }}
                 >
                   <span className="message-icon">
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <CheckIcon width="16" height="16" />
                   </span>
                   <span>Rate limit updated</span>
                 </div>
@@ -1304,20 +1165,7 @@ export default function SettingsPage() {
                   style={{ marginBottom: "var(--space-3)" }}
                 >
                   <span className="message-icon">
-                    <svg
-                      width="16"
-                      height="16"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
-                    </svg>
+                    <InfoCircledIcon width="16" height="16" />
                   </span>
                   <span>Failed to update rate limit</span>
                 </div>
@@ -1408,20 +1256,7 @@ export default function SettingsPage() {
                     border: "1px solid var(--semantic-warning-border)",
                   }}
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
+                  <ExclamationTriangleIcon width="14" height="14" />
                   Not enabled
                 </span>
               </div>
@@ -1640,20 +1475,7 @@ export default function SettingsPage() {
                   }}
                 >
                   github.com/Just-Bamford/AnonVote/issues
-                  <svg
-                    width="12"
-                    height="12"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
+                  <ExternalLinkIcon width="12" height="12" />
                 </a>
               </div>
               <div className="form-group">
@@ -1670,20 +1492,7 @@ export default function SettingsPage() {
                   }}
                 >
                   github.com/Just-Bamford/AnonVote
-                  <svg
-                    width="12"
-                    height="12"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
+                  <ExternalLinkIcon width="12" height="12" />
                 </a>
               </div>
               <div className="form-group">
@@ -1807,96 +1616,12 @@ export default function SettingsPage() {
 
 function getIcon(name: string) {
   const icons: Record<string, React.ReactNode> = {
-    profile: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-        />
-      </svg>
-    ),
-    palette: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-        />
-      </svg>
-    ),
-    stellar: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-    shield: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-        />
-      </svg>
-    ),
-    alert: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-        />
-      </svg>
-    ),
-    contact: (
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-        />
-      </svg>
-    ),
+    profile: <PersonIcon className="w-5 h-5" />,
+    palette: <SunIcon className="w-5 h-5" />,
+    stellar: <CheckCircledIcon className="w-5 h-5" />,
+    shield: <LockClosedIcon className="w-5 h-5" />,
+    alert: <ExclamationTriangleIcon className="w-5 h-5" />,
+    contact: <ChatBubbleIcon className="w-5 h-5" />,
   };
   return icons[name] || null;
 }

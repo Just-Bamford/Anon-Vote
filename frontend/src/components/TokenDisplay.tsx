@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Toast from "./Toast";
+import {
+  KeyboardIcon,
+  CheckIcon,
+  CopyIcon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 
 interface Props {
   token: string;
@@ -39,21 +45,11 @@ export default function TokenDisplay({ token, ballotId }: Props) {
       <div
         style={{ display: "flex", alignItems: "center", gap: "var(--space-2)" }}
       >
-        <svg
+        <KeyboardIcon
           width="18"
           height="18"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
           style={{ color: "var(--brand-primary)", flexShrink: 0 }}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-          />
-        </svg>
+        />
         <span
           style={{
             fontFamily: "var(--font-display)",
@@ -126,37 +122,9 @@ export default function TokenDisplay({ token, ballotId }: Props) {
           }}
         >
           {copied ? (
-            /* Checkmark */
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2.5}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+            <CheckIcon width="16" height="16" />
           ) : (
-            /* Copy icon */
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
+            <CopyIcon width="16" height="16" />
           )}
         </button>
       </div>
@@ -164,20 +132,7 @@ export default function TokenDisplay({ token, ballotId }: Props) {
       {/* Warning */}
       <div className="message message-warning" style={{ marginBottom: 0 }}>
         <span className="message-icon">
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
-          </svg>
+          <ExclamationTriangleIcon width="16" height="16" />
         </span>
         <span style={{ fontSize: "var(--text-sm)" }}>
           Save this token — it cannot be recovered. You'll need it to cast your

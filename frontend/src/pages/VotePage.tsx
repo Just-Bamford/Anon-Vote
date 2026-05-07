@@ -4,6 +4,11 @@ import { getBallot, submitVote } from "../api/client";
 import Navbar from "../components/Navbar";
 import OptionSelector from "../components/OptionSelector";
 import type { Ballot } from "../types";
+import {
+  CheckIcon,
+  InfoCircledIcon,
+  KeyboardIcon,
+} from "@radix-ui/react-icons";
 
 export default function VotePage() {
   const { ballotId } = useParams<{ ballotId: string }>();
@@ -97,19 +102,11 @@ export default function VotePage() {
         {success ? (
           <div className="card p-8 text-center space-y-4">
             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto">
-              <svg
+              <CheckIcon
                 className="w-8 h-8 text-green-600 dark:text-green-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+                width="32"
+                height="32"
+              />
             </div>
             <h2 className="text-2xl font-space-grotesk font-bold text-green-600 dark:text-green-400">
               Vote Submitted
@@ -168,20 +165,7 @@ export default function VotePage() {
                 aria-live="assertive"
               >
                 <span className="message-icon" aria-hidden="true">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
+                  <InfoCircledIcon width="16" height="16" />
                 </span>
                 <span>{error}</span>
               </div>
@@ -194,14 +178,7 @@ export default function VotePage() {
                 </label>
                 <div className="input-wrapper">
                   <span className="input-icon">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                      />
-                    </svg>
+                    <KeyboardIcon />
                   </span>
                   <input
                     type="text"

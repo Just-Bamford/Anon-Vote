@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { useNotifications } from "../context/NotificationContext";
+import { BellIcon } from "@radix-ui/react-icons";
 import "./Navbar.css";
 
 function timeAgo(date: Date): string {
@@ -43,20 +44,7 @@ export default function NotificationDropdown() {
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
-        <svg
-          width="20"
-          height="20"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-          />
-        </svg>
+        <BellIcon width="20" height="20" />
         {notifications.some((n) => !n.read) && (
           <span className="navbar-bell-dot" aria-hidden="true" />
         )}
@@ -122,21 +110,11 @@ export default function NotificationDropdown() {
                     padding: "var(--space-6) var(--space-4)",
                   }}
                 >
-                  <svg
+                  <BellIcon
                     width="24"
                     height="24"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
                     style={{ color: "var(--ink-muted)" }}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                  </svg>
+                  />
                   <span
                     style={{
                       fontSize: "var(--text-sm)",

@@ -5,6 +5,11 @@ import { useAuth } from "../hooks/useAuth";
 import Navbar from "../components/Navbar";
 import BallotCard from "../components/BallotCard";
 import type { Ballot } from "../types";
+import {
+  ClipboardIcon,
+  LightningBoltIcon,
+  CheckCircledIcon,
+} from "@radix-ui/react-icons";
 
 export default function DashboardPage() {
   const { isAuthenticated, loading: authLoading, orgName } = useAuth();
@@ -115,20 +120,10 @@ export default function DashboardPage() {
               >
                 Total Ballots
               </span>
-              <svg
+              <ClipboardIcon
                 className="w-6 h-6"
                 style={{ color: "var(--ink-muted)" }}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-                />
-              </svg>
+              />
             </div>
             <p
               className="text-3xl font-space-grotesk font-bold"
@@ -145,20 +140,10 @@ export default function DashboardPage() {
               >
                 Active Ballots
               </span>
-              <svg
+              <LightningBoltIcon
                 className="w-6 h-6"
                 style={{ color: "var(--semantic-success)" }}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                />
-              </svg>
+              />
             </div>
             <p
               className="text-3xl font-space-grotesk font-bold"
@@ -175,20 +160,10 @@ export default function DashboardPage() {
               >
                 Total Votes Cast
               </span>
-              <svg
+              <CheckCircledIcon
                 className="w-6 h-6"
                 style={{ color: "var(--brand-primary)" }}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+              />
             </div>
             <p
               className="text-3xl font-space-grotesk font-bold"

@@ -1,4 +1,5 @@
 import type { AuditEvent } from "../types";
+import { ExclamationTriangleIcon, CheckIcon } from "@radix-ui/react-icons";
 
 interface Props {
   events: AuditEvent[];
@@ -92,20 +93,7 @@ export default function AuditTable({
       {!isConsistent && (
         <div className="message message-warning">
           <span className="message-icon">
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
+            <ExclamationTriangleIcon width="16" height="16" />
           </span>
           <span>
             Inconsistency detected: tokens issued ({tokensIssued}) does not
@@ -118,20 +106,7 @@ export default function AuditTable({
       {isConsistent && (
         <div className="message message-success">
           <span className="message-icon">
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+            <CheckIcon width="16" height="16" />
           </span>
           <span>Audit consistent: all issued tokens accounted for.</span>
         </div>

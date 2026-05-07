@@ -4,6 +4,13 @@ import type { Ballot } from "../types";
 import Toast from "./Toast";
 import { deleteBallot, tallyBallot } from "../api/client";
 import { useNotifications } from "../context/NotificationContext";
+import {
+  DotsHorizontalIcon,
+  ClipboardIcon,
+  TrashIcon,
+  CopyIcon,
+  ExclamationTriangleIcon,
+} from "@radix-ui/react-icons";
 
 interface Props {
   ballot: Ballot;
@@ -169,16 +176,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
                 e.currentTarget.style.background = "none";
               }}
             >
-              <svg
-                width="14"
-                height="14"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <circle cx="5" cy="12" r="2" />
-                <circle cx="12" cy="12" r="2" />
-                <circle cx="19" cy="12" r="2" />
-              </svg>
+              <DotsHorizontalIcon width="14" height="14" />
             </button>
 
             {menuOpen && (
@@ -230,20 +228,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
                     (e.currentTarget.style.background = "none")
                   }
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                    />
-                  </svg>
+                  <ClipboardIcon width="14" height="14" />
                   Audit Log
                 </button>
 
@@ -286,20 +271,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
                     (e.currentTarget.style.background = "none")
                   }
                 >
-                  <svg
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
+                  <TrashIcon width="14" height="14" />
                   {isDeleting ? "Deleting…" : "Delete"}
                 </button>
               </div>
@@ -312,20 +284,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
       {ballot.result && !ballot.result.isConsistent && (
         <div className="message message-warning mb-4">
           <span className="message-icon" aria-hidden="true">
-            <svg
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
+            <ExclamationTriangleIcon width="16" height="16" />
           </span>
           <span style={{ fontSize: "var(--text-sm)" }}>
             Inconsistency detected: vote count does not match issued tokens.
@@ -418,21 +377,7 @@ export default function BallotCard({ ballot, onBallotDeleted }: Props) {
               padding: "10px 16px",
             }}
           >
-            <svg
-              width="14"
-              height="14"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              style={{ marginRight: "6px" }}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-              />
-            </svg>
+            <CopyIcon width="14" height="14" style={{ marginRight: "6px" }} />
             Copy Voter Link
           </button>
         ) : ballot.result ? (

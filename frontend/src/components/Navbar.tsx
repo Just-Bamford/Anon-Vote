@@ -5,6 +5,7 @@ import { useAvatar } from "../hooks/useAvatar";
 import { useState, useRef, useEffect } from "react";
 import NotificationDropdown from "./NotificationDropdown";
 import { getTotalTokensIssued } from "../api/client";
+import { PersonIcon, SunIcon, MoonIcon, ExitIcon } from "@radix-ui/react-icons";
 import "./Navbar.css";
 
 export default function Navbar() {
@@ -192,19 +193,7 @@ export default function Navbar() {
                     className="navbar-dropdown-item"
                     role="menuitem"
                   >
-                    <svg
-                      className="profile-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
+                    <PersonIcon className="profile-icon" />
                     <span className="profile-option-text">
                       Profile & Settings
                     </span>
@@ -220,28 +209,11 @@ export default function Navbar() {
                         : "Switch to light mode"
                     }
                   >
-                    <svg
-                      className="profile-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      {theme === "light" ? (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                        />
-                      ) : (
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                        />
-                      )}
-                    </svg>
+                    {theme === "light" ? (
+                      <MoonIcon className="profile-icon" />
+                    ) : (
+                      <SunIcon className="profile-icon" />
+                    )}
                     <span className="profile-option-text">
                       {theme === "light" ? "Switch to Dark" : "Switch to Light"}
                     </span>
@@ -253,19 +225,7 @@ export default function Navbar() {
                     role="menuitem"
                     aria-label="Log out of AnonVote"
                   >
-                    <svg
-                      className="profile-icon"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      />
-                    </svg>
+                    <ExitIcon className="profile-icon" />
                     <span className="profile-option-text">Logout</span>
                   </button>
                 </div>
