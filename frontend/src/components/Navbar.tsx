@@ -9,9 +9,10 @@ import { PersonIcon, SunIcon, MoonIcon, ExitIcon } from "@radix-ui/react-icons";
 import "./Navbar.css";
 
 export default function Navbar() {
-  const { isAuthenticated, orgName, orgEmail, logout, loading } = useAuth();
+  const { isAuthenticated, orgName, orgEmail, orgId, logout, loading } =
+    useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { avatarUrl } = useAvatar();
+  const { avatarUrl } = useAvatar(orgId);
   const navigate = useNavigate();
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);

@@ -44,9 +44,9 @@ interface OrganizationDetails {
 }
 
 export default function SettingsPage() {
-  const { orgName, loading: authLoading } = useAuth();
+  const { orgName, orgId, loading: authLoading } = useAuth();
   const { theme, setTheme } = useTheme();
-  const { avatarUrl, uploadAvatar, removeAvatar } = useAvatar();
+  const { avatarUrl, uploadAvatar, removeAvatar } = useAvatar(orgId);
   const { addNotification } = useNotifications();
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [avatarError, setAvatarError] = useState("");
@@ -70,7 +70,7 @@ export default function SettingsPage() {
   const [copySuccess, setCopySuccess] = useState(false);
 
   const [selectedColor, setSelectedColor] = useState<string>(() => {
-    return localStorage.getItem("anonvote-accent") || "#81b800";
+    return localStorage.getItem("anonvote-accent") || "#059669";
   });
   const [selectedFontSize, setSelectedFontSize] = useState<string>(() => {
     return localStorage.getItem("anonvote-font-size") || "14px";

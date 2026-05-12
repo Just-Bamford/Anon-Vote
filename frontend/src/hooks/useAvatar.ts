@@ -1,15 +1,26 @@
 import { useState, useEffect } from "react";
 
-const AVATAR_KEY = "anonvote-avatar";
+const AVATAR_KEY_PREFIX = "avatar_";
 
 /**
  * Manages the user's avatar image stored as a base64 data URL in localStorage.
+ * Scoped to user ID so different accounts have independent avatars.
  * Falls back to the first letter of the org name if no image is set.
  */
-export function useAvatar() {
+export function useAvatar(userId: string | null) {
+  const getAvatarKey = (id: string | null) => {
+    return id ? `${AVATAR_KEY_PREFIX}${id}` : "avatar_default";
+  };
+
   const [avatarUrl, setAvatarUrl] = useState<string | null>(() => {
-    return localStorage.getItem(AVATAR_KEY);
+    return localStorage.getItem(getAvatarKey(userId));
   });
+
+  // Update avatar when userId changes
+  useEffect(() => {
+    const avatarUrl = localStorage.getItem(getAvatarKey(userId));
+    setAvatarUrl(avatarUrl);
+  }, [userId]);
 
   const uploadAvatar = (file: File): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -25,7 +36,7 @@ export function useAvatar() {
       const reader = new FileReader();
       reader.onload = (e) => {
         const dataUrl = e.target?.result as string;
-        localStorage.setItem(AVATAR_KEY, dataUrl);
+        localStorage.setItem(getAvatarKey(userId), dataUrl);
         setAvatarUrl(dataUrl);
         // Dispatch event so other components (Navbar) update immediately
         window.dispatchEvent(new Event("avatar-updated"));
@@ -37,7 +48,7 @@ export function useAvatar() {
   };
 
   const removeAvatar = () => {
-    localStorage.removeItem(AVATAR_KEY);
+    localStorage.removeItem(getAvatarKey(userId));
     setAvatarUrl(null);
     window.dispatchEvent(new Event("avatar-updated"));
   };
@@ -45,11 +56,11 @@ export function useAvatar() {
   // Listen for updates from other components
   useEffect(() => {
     const handler = () => {
-      setAvatarUrl(localStorage.getItem(AVATAR_KEY));
+      setAvatarUrl(localStorage.getItem(getAvatarKey(userId)));
     };
     window.addEventListener("avatar-updated", handler);
     return () => window.removeEventListener("avatar-updated", handler);
-  }, []);
+  }, [userId]);
 
   return { avatarUrl, uploadAvatar, removeAvatar };
 }

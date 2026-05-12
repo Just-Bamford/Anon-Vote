@@ -31,33 +31,46 @@ interface NotificationContextType {
   addNotification: (
     notification: Omit<Notification, "id" | "time" | "read">,
   ) => void;
+  clearNotifications: () => void;
+  setUserId: (userId: string | null) => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(
   undefined,
 );
 
-const STORAGE_KEY = "anonvote-notifications-v2";
+const STORAGE_KEY_PREFIX = "anonvote-notifications_";
+const VOTE_COUNTS_KEY_PREFIX = "anonvote-vote-counts_";
 
-// Track vote counts per ballot so we can detect new votes
-const VOTE_COUNTS_KEY = "anonvote-vote-counts";
+function getStorageKey(userId: string | null): string {
+  return userId
+    ? `${STORAGE_KEY_PREFIX}${userId}`
+    : STORAGE_KEY_PREFIX + "default";
+}
 
-function loadVoteCounts(): Record<string, number> {
+function getVoteCountsKey(userId: string | null): string {
+  return userId
+    ? `${VOTE_COUNTS_KEY_PREFIX}${userId}`
+    : VOTE_COUNTS_KEY_PREFIX + "default";
+}
+
+function loadVoteCounts(userId: string | null): Record<string, number> {
   try {
-    return JSON.parse(localStorage.getItem(VOTE_COUNTS_KEY) || "{}");
+    return JSON.parse(localStorage.getItem(getVoteCountsKey(userId)) || "{}");
   } catch {
     return {};
   }
 }
 
-function saveVoteCounts(counts: Record<string, number>) {
-  localStorage.setItem(VOTE_COUNTS_KEY, JSON.stringify(counts));
+function saveVoteCounts(userId: string | null, counts: Record<string, number>) {
+  localStorage.setItem(getVoteCountsKey(userId), JSON.stringify(counts));
 }
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
+  const [userId, setUserId] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(getStorageKey(null));
       if (saved) {
         const parsed = JSON.parse(saved);
         // Restore Date objects
@@ -67,9 +80,29 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     return [];
   });
 
+  // When userId changes, load the user's notifications
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notifications));
-  }, [notifications]);
+    const key = getStorageKey(userId);
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Restore Date objects
+        setNotifications(
+          parsed.map((n: any) => ({ ...n, time: new Date(n.time) })),
+        );
+      } else {
+        setNotifications([]);
+      }
+    } catch {
+      setNotifications([]);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const key = getStorageKey(userId);
+    localStorage.setItem(key, JSON.stringify(notifications));
+  }, [notifications, userId]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -92,6 +125,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  const clearNotifications = () => {
+    setNotifications([]);
+    const key = getStorageKey(userId);
+    localStorage.removeItem(key);
+    const voteKey = getVoteCountsKey(userId);
+    localStorage.removeItem(voteKey);
+  };
+
   // Poll for real events every 30 seconds
   useEffect(() => {
     let cancelled = false;
@@ -103,7 +144,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         const ballots = res.data.data;
         if (!ballots?.length) return;
 
-        const voteCounts = loadVoteCounts();
+        const voteCounts = loadVoteCounts(userId);
         const updatedCounts: Record<string, number> = { ...voteCounts };
 
         for (const ballot of ballots) {
@@ -126,7 +167,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
           } catch {}
         }
 
-        saveVoteCounts(updatedCounts);
+        saveVoteCounts(userId, updatedCounts);
       } catch {}
     }
 
@@ -136,11 +177,18 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [addNotification]);
+  }, [addNotification, userId]);
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, unreadCount, markAllAsRead, addNotification }}
+      value={{
+        notifications,
+        unreadCount,
+        markAllAsRead,
+        addNotification,
+        clearNotifications,
+        setUserId,
+      }}
     >
       {children}
     </NotificationContext.Provider>
